@@ -25,7 +25,6 @@ for url in list_of_urls:
             positions_data=json.loads(position_data_raw)
 
             for index, position in enumerate(positions_data):
-                print(position)
                 print(index+1)
                 print('Position:', position['name'])
                 print('Department:', position['department'])

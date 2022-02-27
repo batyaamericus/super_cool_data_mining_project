@@ -10,7 +10,7 @@ with open('urls.csv') as csvfile:
     for row in reader:
         list_of_urls.append(row['link'].replace('/'.join(row['link'].split('/')[-2:]),''))
 
-i=0;
+i=0
 for url in list_of_urls:
     print(url)
     page = requests.get(url)
@@ -25,12 +25,15 @@ for url in list_of_urls:
             positions_data=json.loads(position_data_raw)
 
             for index, position in enumerate(positions_data):
-                print(index+1)
-                print('Position:', position['name'])
-                print('Department:', position['department'])
-                print('Location:', position['location']['name'])
-                print('Employment type:', position['employment_type'])
-                print("About:")
-                for y in position['custom_fields']['details']:
-                    print('\t',y['value'])
-                print('\n\n')
+                try:
+                    print(index+1)
+                    print('Position:', position['name'])
+                    print('Department:', position['department'])
+                    print('Location:', position['location']['name'])
+                    print('Employment type:', position['employment_type'])
+                    print('About:')
+                    for y in position['custom_fields']['details']:
+                        print('\t',y['value'])
+                    print('\n\n')
+                except TypeError as ex:
+                    print(ex)

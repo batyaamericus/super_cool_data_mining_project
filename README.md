@@ -14,3 +14,13 @@ The project: a web scraper for finding job positions from comeet.com company pag
 
 Part 1 contains general code for collecting urls from a Google search, whereas part 2 is specific to the build of the web pages we worked on.
 
+## To run the scrape:
+1. This code was written in Python 3.9, make sure your working environment can run this code.
+2. Save this repo to a local directory.
+    > `git clone https://github.com/batyaamericus/super_cool_data_mining_project.git`
+3. Move to the super_cool_data_mining_project directory that you just created.
+    > `cd super_cool_data_mining_project`
+4. Make sure that all of the requirements in the requirements.txt are met by your working environment.
+5. Run scraping.py!
+    > in command line: `python scraping.py`
+* if your operating system does not recognise the `python` command, try running `python3`

@@ -18,11 +18,13 @@ for url in list_of_urls:
     results = soup.find_all('script', type='text/javascript')
     lol=0
     for i in results:
-        if re.search('COMPANY_DATA = ({.*})',i.get_text()):
-            company_data= json.loads(re.search('COMPANY_DATA = ({.*})',i.get_text()).group(1))
+        name_of_element = re.search('COMPANY_DATA = ({.*})', i.get_text())
+        if name_of_element:
+            company_data= json.loads(name_of_element.group(1))
+
             pattern = 'COMPANY_POSITIONS_DATA = (\[{.*}\])'
-            position_data_raw=re.search(pattern,i.get_text()).group(1)
-            positions_data=json.loads(position_data_raw)
+            position_data_raw = re.search(pattern, i.get_text()).group(1)
+            positions_data = json.loads(position_data_raw)
 
             for index, position in enumerate(positions_data):
                 try:
@@ -33,7 +35,7 @@ for url in list_of_urls:
                     print('Employment type:', position['employment_type'])
                     print('About:')
                     for y in position['custom_fields']['details']:
-                        print('\t',y['value'])
+                        print('\t', y['value'])
                     print('\n\n')
                 except TypeError as ex:
                     print(ex)

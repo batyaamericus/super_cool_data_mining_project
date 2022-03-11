@@ -62,3 +62,4 @@ with mysql_connection as mysql_connection:
                                                  FOREIGN KEY (position_uid) REFERENCES positions(position_uid) \
                                                  );'
         mysql_cursor.execute(positions_description)
+        mysql_connection.commit()

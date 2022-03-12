@@ -1,14 +1,25 @@
 import pymysql.cursors
+from sqlalchemy import Column
+from sqlalchemy import Integer
+from sqlalchemy import Boolean
+from sqlalchemy import String
+from sqlalchemy import Time
+from sqlalchemy import Text
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import declarative_base
+from sqlalchemy import create_engine
 
 """
 creating a database into which we will put all of the information about the jobs we will scrape
 """
 
+Base = declarative_base()
+engine = create_engine('mysql+pymysql://<user>:<password>@<host>/comeet_jobs', echo=True, future=True)
 
 # creating the database "comeet_jobs"
-mysql_connection = pymysql.connect(host='localhost',
-                                   user='root',
-                                   password='abcd',
+mysql_connection = pymysql.connect(host='<host>',
+                                   user='<user>',
+                                   password='<password>',
                                    cursorclass=pymysql.cursors.DictCursor)
 with mysql_connection as mysql_connection:
     with mysql_connection.cursor() as mysql_cursor:
@@ -17,49 +28,58 @@ with mysql_connection as mysql_connection:
 
 
 # connecting to the comeet_jobs database in order to fill it with the relevant tables
-mysql_connection = pymysql.connect(host='localhost',
-                                   user='root',
-                                   password='abcd',
-                                   database='comeet_jobs',
-                                   cursorclass=pymysql.cursors.DictCursor)
-with mysql_connection as mysql_connection:
-    with mysql_connection.cursor() as mysql_cursor:
-        # company tables
-        companies_table = 'CREATE TABLE companies ( \
-                                               company_uid VARCHAR(6) PRIMARY KEY, \
-                                               company_name VARCHAR(256) NOT NULL, \
-                                               location VARCHAR(256), \
-                                               website VARCHAR(256) \
-                                               );'
-        mysql_cursor.execute(companies_table)
-        company_description = 'CREATE TABLE company_description ( \
-                                               company_uid VARCHAR(6), \
-                                               description LONGTEXT, \
-                                               FOREIGN KEY (company_uid) REFERENCES companies(company_uid) \
-                                               );'
-        mysql_cursor.execute(company_description)
+# company tables
+class Company(Base):
+    __tablename__ = 'companies'
 
-        # position tables
-        positions_table = 'CREATE TABLE positions ( \
-                                             position_uid VARCHAR(6) PRIMARY KEY, \
-                                             position_name VARCHAR(256) NOT NULL, \
-                                             department VARCHAR(256), \
-                                             location VARCHAR(256), \
-                                             employment_type VARCHAR(256), \
-                                             experience_level VARCHAR(50), \
-                                             time_updated DATETIME, \
-                                             company_uid VARCHAR(6), \
-                                             FOREIGN KEY (company_uid) REFERENCES companies(company_uid) \
-                                             );'
-        mysql_cursor.execute(positions_table)
-        positions_description = 'CREATE TABLE positions_description ( \
-                                                 position_uid VARCHAR(6), \
-                                                 description LONGTEXT, \
-                                                 requirements LONGTEXT, \
-                                                 what_will_you_do LONGTEXT, \
-                                                 about_us LONGTEXT, \
-                                                 you_are LONGTEXT, \
-                                                 FOREIGN KEY (position_uid) REFERENCES positions(position_uid) \
-                                                 );'
-        mysql_cursor.execute(positions_description)
-        mysql_connection.commit()
+    company_uid = Column(String(6), primary_key=True)
+    name = Column(String(256))
+    location = Column(String(256))
+    website = Column(String(256))
+    job_website = Column(String(256))
+
+    def __repr__(self):
+        return f'Company(id={self.company_uid!r}, name={self.name!r}, location={self.location!r}, website={self.website!r})'
+
+
+class CompanyDescription(Base):
+    __tablename__ = 'company_description'
+
+    id = Column(Integer, primary_key=True)
+    company_uid = Column(String(6), ForeignKey('companies.company_uid'), nullable=False)
+    description = Column(Text)
+
+    def __repr__(self):
+        return f'CompanyDescription(company_id={self.company_uid!r}, description={self.description!r})'
+
+
+class Position(Base):
+    __tablename__ = 'positions'
+
+    position_uid = Column(String(6), primary_key=True)
+    pos_name = Column(String(256), nullable=False)
+    department = Column(String(256))
+    # is_remote = Column(Boolean)
+    location = Column(String(256))
+    employment_type = Column(String(256))
+    experience_level = Column(String(256))
+    time_updated = Column(Time)
+    company_uid = Column(String(6), ForeignKey('companies.company_uid'), nullable=False)
+
+    def __repr__(self):
+        return f'Position(position_id={self.position_uid!r}, position_name={self.pos_name!r}, department={self.department!r}, location={self.location!r}, employment_type={self.employment_type!r}, experience={self.experience_level!r}, time_updated={self.time_updated!r}, company_id={self.company_uid!r})'
+
+
+class PositionDescription(Base):
+    __tablename__ = 'position_description'
+
+    id = Column(Integer, primary_key=True)
+    position_uid = Column(String(6), ForeignKey('positions.position_uid'), nullable=False)
+    description_title = Column(String(256))
+    description = Column(Text)
+
+    def __repr__(self):
+        return f'Position(id={self.id!r}, position_id={self.position_uid!r}, description_title={self.description_title!r}, description={self.description!r})'
+
+
+Base.metadata.create_all(engine)

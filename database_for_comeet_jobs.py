@@ -36,7 +36,6 @@ class Company(Base):
     name = Column(String(256))
     location = Column(String(256))
     website = Column(String(256))
-    job_website = Column(String(256))
 
     def __repr__(self):
         return f'Company(id={self.company_uid!r}, name={self.name!r}, location={self.location!r}, website={self.website!r})'

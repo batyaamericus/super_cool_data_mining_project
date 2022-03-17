@@ -1,19 +1,20 @@
 import NewArgParser as nap
 import argparse
-import sys
+
 
 def setting_comp_search_params():
     company_search = nap.NewArgParser(exit_on_error=False)
     exit_parser = nap.NewArgParser(exit_on_error=False)
-    company_search.add_argument('search_parameter', type=str, choices = ['n', 'l'], help="'n' to search by company name, "
-                                                                             "'l' to search by company location. You"
-                                                                             " can only perform one of the two searches.")
-    company_search.add_argument('input', type=str, nargs='+', help="Follow you previous command with names or locations "
-                                                                   " to search. Please write '_' instead of any whitespaces present"
-                                                                   " in the company names or locations.")
+    company_search.add_argument('search_parameter', type=str, choices=['n', 'l'], help="'n' to search by company name, "
+                                                                                       "'l' to search by company location. You"
+                                                                                       " can only perform one of the two searches.")
+    company_search.add_argument('input', type=str, nargs='+',
+                                help="Follow you previous command with names or locations "
+                                     " to search. Please write '_' instead of any whitespaces present"
+                                     " in the company names or locations.")
     company_search.add_argument('-b', '--back', action='store_true', help='back to main menu')
     exit_parser.add_argument('-b', '--back', action='store_true', help='back to main menu')
-    param_dic={'name': None, 'location':None}
+    param_dic = {'name': None, 'location': None}
 
     while True:
 
@@ -21,16 +22,16 @@ def setting_comp_search_params():
             options = input("Enter search parameters:")
             args, unknown = company_search.parse_known_args(options.split())
 
-            #returning False to return to main menu
+            # returning False to return to main menu
             if args.back:
                 return False
 
-            if args.search_parameter=='n':
-                param_dic['name']=args.input
+            if args.search_parameter == 'n':
+                param_dic['name'] = args.input
             else:
-                param_dic['location']=args.input
+                param_dic['location'] = args.input
 
-            return  param_dic
+            return param_dic
 
         except argparse.ArgumentError as error:
             exit_bool, unknown = exit_parser.parse_known_args(options.split())
@@ -40,7 +41,6 @@ def setting_comp_search_params():
             continue
         except SystemExit:
             continue
-
 
 
 def setting_display_params():
@@ -69,16 +69,14 @@ def setting_display_params():
 
         flags_dic['description'] = params.d
         flags_dic['location'] = params.l
-        flags_dic['website']=params.w
-        flags_dic['positions']=params.p
-        flags_dic['all']=params.all
-        if all([v==False for v in flags_dic.values()]):
+        flags_dic['website'] = params.w
+        flags_dic['positions'] = params.p
+        flags_dic['all'] = params.all
+        if all([v == False for v in flags_dic.values()]):
             print("You did not enter any display parameters. By default the program will display company website.")
             flags_dic['website'] = True
 
-        return  flags_dic
-
-
+        return flags_dic
 
 
 def setting_posit_display_params():
@@ -113,14 +111,15 @@ def setting_posit_display_params():
         flags_dic['description'] = params.s
         flags_dic['all'] = params.all
         if all([v == False for v in flags_dic.values()]):
-            print("You did not enter any display parameters. By default the program will only display position title and company name.")
+            print(
+                "You did not enter any display parameters. By default the program will only display position title and company name.")
 
         return flags_dic
 
 
 def setting_posit_search_params():
     print("You have selected to search for positions!")
-    positions_search_parser= nap.NewArgParser(exit_on_error=False)
+    positions_search_parser = nap.NewArgParser(exit_on_error=False)
     positions_search_parser.add_argument('-n', '--n', type=str, nargs='+', help='by name')
     positions_search_parser.add_argument('-d', '--d', type=str, nargs='+', help='by department')
     positions_search_parser.add_argument('-l', '--l', type=str, nargs='+', help='by location')
@@ -128,7 +127,7 @@ def setting_posit_search_params():
     positions_search_parser.add_argument('-e', '--e', type=str, nargs='+', help='by experience level')
     positions_search_parser.add_argument('-c', '--c', type=str, nargs='+', help='by company')
     positions_search_parser.add_argument('-b', '--back', action='store_true', help='back to main menu')
-    param_dic={}
+    param_dic = {}
 
     while True:
 
@@ -136,7 +135,7 @@ def setting_posit_search_params():
             options = input("Enter search parameters:")
             args, unknown = positions_search_parser.parse_known_args(options.split())
 
-            #returning False to return to main menu
+            # returning False to return to main menu
             if args.back:
                 return False
 
@@ -158,5 +157,3 @@ def setting_posit_search_params():
             continue
         except SystemExit:
             continue
-
-

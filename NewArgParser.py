@@ -1,5 +1,6 @@
 import argparse
 
+
 class NewArgParser(argparse.ArgumentParser):
     def error(self, message):
         """error(message: string)

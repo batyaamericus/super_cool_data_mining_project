@@ -1,8 +1,9 @@
+import os
 
-'''USER DEFINED:'''
-USER_NAME = 'your_username'
-PASSWORD = 'your_password'
-HOST = 'your_host'
+'''PLEASE ENTER YOUR INFORMATION FOR THE VARIABLES BELOW:'''
+USER_NAME = os.environ['username']
+PASSWORD = os.environ['password']
+HOST = os.environ['host']
 
-'''OTHER'''
+'''DB'''
 ENGINE_URL = f'mysql+pymysql://{USER_NAME}:{PASSWORD}@{HOST}/comeet_jobs'

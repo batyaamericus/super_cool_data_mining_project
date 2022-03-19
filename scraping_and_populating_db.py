@@ -3,16 +3,16 @@ from bs4 import BeautifulSoup
 import json
 import re
 from datetime import datetime
-from sqlalchemy.orm import Session
 from sqlalchemy.dialects.mysql import insert
+import database
 import db_details as db
 import finding_websites
-import config
 
 
 def scraping():
     # finding relevant elements in page
     for url in finding_websites.extract_company_urls():
+        print(url)
         page = requests.get(url)
         if page.status_code == requests.codes.ok:
             soup = BeautifulSoup(page.content, "html.parser")
@@ -27,7 +27,7 @@ def scraping():
 
                     # extracting company data
                     try:
-                        with Session(config.ENGINE_URL) as session:
+                        with database.engine.connect() as conn:
                             insert_company = insert(db.Company).values(
                                 company_uid=company_data['company_uid'],
                                 name=company_data['name'],
@@ -44,8 +44,10 @@ def scraping():
                             on_duplicate_description = insert_company_description.on_duplicate_key_update(
                                 description=insert_company_description.inserted.description)
 
-                            session.add_all([on_duplicate_company, on_duplicate_description])
-                            session.commit()
+                            conn.execute(on_duplicate_company)
+                            conn.execute(on_duplicate_description)
+                            conn.commit()
+
                     except TypeError:
                         pass
 
@@ -56,7 +58,7 @@ def scraping():
                     # extracting data about positions
                     for index, position in enumerate(positions_data):
                         try:
-                            with Session(config.ENGINE_URL) as session:
+                            with database.engine.connect() as conn:
                                 insert_position = insert(db.Position).values(
                                     position_uid=position['uid'],
                                     pos_name=position['name'],
@@ -76,8 +78,8 @@ def scraping():
                                     experience_level=insert_position.inserted.experience_level,
                                     time_updated=insert_position.inserted.time_updated)
 
-                                session.add(on_duplicate_position)
-                                session.commit()
+                                conn.execute(on_duplicate_position)
+                                conn.commit()
 
                                 for description in position['custom_fields']['details']:
                                     insert_position_descriptions = insert(db.PositionDescription).values(
@@ -88,8 +90,9 @@ def scraping():
                                     on_duplicate_position_description = insert_position_descriptions.on_duplicate_key_update(
                                         description_title=insert_position_descriptions.inserted.description_title, description=insert_position_descriptions.inserted.description)
 
-                                    session.add(on_duplicate_position_description)
-                                    session.commit()
+                                    conn.execute(on_duplicate_position_description)
+                                    conn.commit()
+
                         except TypeError:
                             continue
                         except KeyError:

@@ -6,7 +6,7 @@ import config
 
 class DBsearch:
     def __init__(self):
-        self.engine = create_engine(f'mysql+pymysql://{CONFIG.DBUSER}:{CONFIG.DBPASSWORD}@{CONFIG.DBHOST}/comeet_jobs')
+        self.engine = create_engine(config.ENGINE_URL)
         self.conn = self.engine.connect()
         self.conn.begin()
 
@@ -141,28 +141,28 @@ class DBsearch:
 
         clause = 'WHERE '
         conditions = []
-        if not posit_params['name'] is None:
+        if posit_params['name'] is not None:
             conditions.append('LOWER(pos_name) LIKE' + " OR LOWER(pos_name) LIKE ".join(
                 ["'%{0}%'".format(name.lower().replace('_', ' ')) for name in posit_params['name']]))
 
-        if not posit_params['location'] is None:
+        if posit_params['location'] is not None:
             conditions.append('LOWER(location) LIKE ' + " OR LOWER(location) LIKE ".join(
                 ["'%{0}%'".format(loc.lower().replace('_', ' ')) for loc in posit_params['location']]))
 
-        if not posit_params['department'] is None:
+        if posit_params['department'] is not None:
             conditions.append('LOWER(department) LIKE ' + " OR LOWER(department) LIKE ".join(
                 ["'%{0}%'".format(dep.lower().replace('_', ' ')) for dep in posit_params['department']]))
 
-        if not posit_params['emp_type'] is None:
+        if posit_params['emp_type'] is not None:
             conditions.append('LOWER(employment_type) LIKE ' + " OR LOWER(employment_type) LIKE ".join(
                 ["'%{0}%'".format(type.lower().replace('_', ' ')) for type in posit_params['emp_type']]))
 
-        if not posit_params['exp_level'] is None:
+        if posit_params['exp_level'] is not None:
             conditions.append('LOWER(experience_level) LIKE ' + " OR LOWER(experience_level) LIKE ".join(
                 ["'%{0}%'".format(level.lower().replace('_', ' ')) for level in posit_params['exp_level']]))
 
         comp_uids = []
-        if not posit_params['company'] is None:
+        if posit_params['company'] is not None:
             for comp_name in posit_params['company']:
                 comp_uids.append(self.get_company_uid_from_name(comp_name.lower().replace('_', ' ')))
 

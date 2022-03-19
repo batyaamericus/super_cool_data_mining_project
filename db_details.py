@@ -1,4 +1,4 @@
-from sqlalchemy import Column
+from sqlalchemy import Column, func
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import DateTime
@@ -21,6 +21,8 @@ class Company(Base):
     name = Column(String(256))
     location = Column(String(256))
     website = Column(String(256))
+    db_time_created = Column(DateTime(timezone=True), server_default=func.now())
+    db_time_updated = Column(DateTime(timezone=True), onupdate=func.now())
 
     positions = relationship("Position", back_populates="company", cascade="all, delete-orphan")
     descriptions = relationship("CompanyDescription", back_populates="company", cascade="all, delete-orphan")
@@ -35,6 +37,8 @@ class CompanyDescription(Base):
     id = Column(Integer, primary_key=True)
     company_uid = Column(String(6), ForeignKey('companies.company_uid'), nullable=False)
     description = Column(Text)
+    db_time_created = Column(DateTime(timezone=True), server_default=func.now())
+    db_time_updated = Column(DateTime(timezone=True), onupdate=func.now())
 
     company = relationship("Company", back_populates="descriptions")
 
@@ -56,6 +60,8 @@ class Position(Base):
     experience_level = Column(String(256))
     time_updated = Column(DateTime)
     company_uid = Column(String(6), ForeignKey('companies.company_uid'), nullable=False)
+    db_time_created = Column(DateTime(timezone=True), server_default=func.now())
+    db_time_updated = Column(DateTime(timezone=True), onupdate=func.now())
 
     company = relationship("Company", back_populates="positions")
     descriptions = relationship("PositionDescription", back_populates="position", cascade="all, delete-orphan")
@@ -71,6 +77,8 @@ class PositionDescription(Base):
     position_uid = Column(String(6), ForeignKey('positions.position_uid'), nullable=False)
     description_title = Column(String(256))
     description = Column(Text)
+    db_time_created = Column(DateTime(timezone=True), server_default=func.now())
+    db_time_updated = Column(DateTime(timezone=True), onupdate=func.now())
 
     position = relationship("Position", back_populates="descriptions")
 

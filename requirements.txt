@@ -16,4 +16,5 @@ requests==2.27.1
 six==1.16.0
 soupsieve==2.3.1
 SQLAlchemy==1.4.32
+SQLAlchemy-Utils==0.38.2
 urllib3==1.26.8

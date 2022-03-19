@@ -187,7 +187,7 @@ def setting_posit_search_params():
                   "\t'-e' to search positions by experience level (e.g. '-e Entry-level')\n"
                   "\t'-c' to search by company name (e.g. '-c Comp1 Comp2')\n"
                   "Type '-h' for help and '-b' to go back to the previous menu")
-            options=input('Please type you search parameters:')
+            options = input('Please type you search parameters:')
             args, unknown = positions_search_parser.parse_known_args(options.split())
 
             # returning False to return to main menu

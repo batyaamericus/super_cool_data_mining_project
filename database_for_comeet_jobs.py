@@ -1,13 +1,14 @@
 import pymysql.cursors
 from sqlalchemy import Column
 from sqlalchemy import Integer
-from sqlalchemy import Boolean
 from sqlalchemy import String
 from sqlalchemy import Time
 from sqlalchemy import Text
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import create_engine
+
+import CONFIG
 
 
 def create_db():
@@ -16,12 +17,12 @@ def create_db():
     """
 
     Base = declarative_base()
-    engine = create_engine('mysql+pymysql://<user>:<password>@<host>/comeet_jobs', echo=True, future=True)
+    engine = create_engine(f'mysql+pymysql://<user>:<password>@<host>/comeet_jobs', echo=True, future=True)
 
     # creating the database "comeet_jobs"
-    mysql_connection = pymysql.connect(host='<host>',
-                                       user='<user>',
-                                       password='<password>',
+    mysql_connection = pymysql.connect(host=CONFIG.DBHOST,
+                                       user=CONFIG.DBUSER,
+                                       password=CONFIG.DBPASSWORD,
                                        cursorclass=pymysql.cursors.DictCursor)
     with mysql_connection as mysql_connection:
         with mysql_connection.cursor() as mysql_cursor:

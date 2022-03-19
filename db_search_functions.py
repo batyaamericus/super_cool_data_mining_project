@@ -1,15 +1,22 @@
 from sqlalchemy import create_engine, text
 import html2text
 import pandas as pd
+import CONFIG
 
 
 class DBsearch:
     def __init__(self):
-        self.engine = create_engine('mysql+pymysql://root:abcd@localhost/comeet_jobs')
+        self.engine = create_engine(f'mysql+pymysql://{CONFIG.DBUSER}:{CONFIG.DBPASSWORD}@{CONFIG.DBHOST}/comeet_jobs')
         self.conn = self.engine.connect()
         self.conn.begin()
 
     def get_company_uid_from_name(self, name):
+        """
+            This function gets the unique company id from the database based on the company name
+
+        :param name: name of company
+        :return: uid: company uid
+        """
         uid = None
 
         statement = f"SELECT company_uid FROM companies WHERE LOWER(name) LIKE '%{name}%'"
@@ -22,6 +29,12 @@ class DBsearch:
         return uid
 
     def get_company_name_from_uid(self, uid):
+        """
+        This function gets the company from the database based on the company uid.
+
+        :param uid: company uid
+        :return: name: company name
+        """
 
         statement = f"SELECT name FROM companies WHERE company_uid='{uid}'"
         ins = text(statement)
@@ -31,6 +44,12 @@ class DBsearch:
             return result[0]
 
     def get_company_info(self, uid):
+        """
+        This function gets company info (location and website) from the database given company uid
+
+        :param uid: company uid
+        :return: info: dictionary with company info
+        """
 
         statement = f"SELECT location, website FROM companies WHERE company_uid='{uid}'"
         ins = text(statement)
@@ -42,6 +61,12 @@ class DBsearch:
             return info
 
     def get_company_description(self, uid):
+        """
+            This function gets company description from the database given company uid
+
+        :param uid: company uid
+        :return: company description as a string
+        """
         statement = f"SELECT description FROM company_description WHERE company_uid='{uid}'"
         ins = text(statement)
 
@@ -51,6 +76,12 @@ class DBsearch:
             return html2text.html2text(result[0])
 
     def get_companies_by_loc(self, locations):
+        """
+            This functions returns a list of names of all companies based in the locations provided in the input list.
+
+        :param locations: space separated list of locations
+        :return: list of company names
+        """
 
         company_names = []
         for location in locations:
@@ -66,15 +97,14 @@ class DBsearch:
         return company_names
 
     def comp_search_db(self, search_param, display_params, posit_disp_params):
-        """ {'name': ['name', 'lol', 'ashgj'], 'location': None}
-        {'description': True, 'location': True, 'website': False, 'positions': True, 'all': False}
-        {'department': True, 'location': False, 'employment type': True, 'experience level': True, 'all': False}"""
+        """
+        This function performs the company search and displays the output.
+        
+           :param search_param: search options that the user has selected
+           :param display_params: display parameters that the user has selected
+           :param posit_disp_params: display parameters that the user has selected for positions
+        """""
 
-        print(search_param)
-        print(display_params)
-        print(posit_disp_params)
-
-        # search by name
         if not search_param['name'] is None:
             company_names = search_param['name']
 
@@ -102,6 +132,12 @@ class DBsearch:
                 self.posit_search_db(name_dic, posit_disp_params)
 
     def create_posit_where_clause(self, posit_params):
+        """
+            This is a helper function that creates a single WHERE clause for the SQL query, comprised of all the
+            search parameters specified by the user
+        :param posit_params: parameters for open positions search
+        :return: WHERE clause as a string
+        """
 
         clause = 'WHERE '
         conditions = []
@@ -134,10 +170,14 @@ class DBsearch:
 
         clause += ' AND '.join(["({0})".format(cond) for cond in conditions])
 
-        print(clause)
         return clause
 
     def get_position_description(self, uid):
+        """
+            This function returns the position description from the database based on position uid.
+        :param uid: position uid
+        :return: position description
+        """
 
         statement = f"SELECT description FROM position_description WHERE position_uid='{uid}'"
         ins = text(statement)
@@ -147,14 +187,16 @@ class DBsearch:
             return html2text.html2text(result[0])
 
     def posit_search_db(self, posit_params, posit_display_params):
-        """{'name': None, 'location': None, 'department': None, 'emp_type': None, 'exp_level': None, 'company': ['zesty']}
-{'department': False, 'location': False, 'employment type': False, 'experience level': False, 'all': False}"""
-        print(posit_params)
-        print(posit_display_params)
+        """
+            This function preform the search for open positions and displays the output.
+           :param posit_params: search parameters selected by the user
+           :param posit_display_params: output display parameters selected by the user
+           :return:
+        """
+
         where_clause = self.create_posit_where_clause(posit_params)
 
         statement = "SELECT * FROM positions " + where_clause
-        print(statement)
         ins = text(statement)
         sql_df = pd.read_sql(ins, self.conn)
         companies = sql_df.groupby('company_uid')

@@ -21,6 +21,7 @@ Part 1 contains general code for collecting urls from a Google search, whereas p
 3. Move to the super_cool_data_mining_project directory that you just created.
     > `cd super_cool_data_mining_project`
 4. Make sure that all of the requirements in the requirements.txt are met by your working environment.
-5. Run scraping.py!
-    > in command line: `python scraping.py`
+5. Go to CONFIG.py file and insert the username, password and host for your SQL database
+6. Run user_interface_menu.py!
+    > in command line: `user_interface_menu.py`
 * if your operating system does not recognise the `python` command, try running `python3`

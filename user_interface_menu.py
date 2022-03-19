@@ -7,17 +7,20 @@ import scraping_and_populating_db
 
 
 def main_menu():
+    """This function displays the main menu prompting the user to selected company or positions search"""
+
     scraping_and_populating_db.scraping()
 
     db_connector = DBsearch()
     sys.stdout.write('Welcome to the Comeet Scraper!\n')
     args = None
     while True:
+        print("Please choose if you want to search for a company or for open job positions. Type'c' for the former and 'p' for the latter.\n"
+              "Type '-h' for help and '-q' to quit the program.")
         command = input("Enter command :")
         parser = nap.NewArgParser(exit_on_error=False)
 
         subparsers = parser.add_subparsers(help="Type of search: 'c' for company search and 'p' for positions search")
-        # subparsers.required = True
         parser.add_argument('-Q', '--quit', '-q', action='store_true', help="Exit the application")
 
         company_search_parser = subparsers.add_parser("c")
@@ -53,15 +56,19 @@ def main_menu():
 
 
 def search_company_menu(db_connector):
+    """This function presents a sub-menu for users who have selected to search for companies.
+        It prompts the users to search the search and display parameters for the output.
+        Finally it calls comp_search_db to preform the search."""
+
     print("You have selected to search for a company!")
 
-    comp_params = uif.setting_comp_search_params()  # expecting: comp_params={'name'=[-names-], 'location'=[-location-]}
+    comp_params = uif.setting_comp_search_params()
 
     # if return value is False, the user selected -b
     if not comp_params:
         return
 
-    display_params = uif.setting_display_params()  # expecting: display_params= {'description','info', 'website', 'positions', 'all'}
+    display_params = uif.setting_display_params()
 
     # if return value is False, the user selected -x
     if not display_params:
@@ -74,18 +81,15 @@ def search_company_menu(db_connector):
         if not posit_disp_params:
             return
 
-    company_names_list = comp_params['name']  # can be none
-    company_locations_list = comp_params['location']  # can be none
-
-    print("this is what you've got for company:")
-    print(company_names_list, company_locations_list)
-    print(display_params)
 
     db_connector.comp_search_db(comp_params, display_params, posit_disp_params)
 
 
 def search_positions_menu(db_connector):
-    posit_params = uif.setting_posit_search_params()  # expecting: dictionary of lists posit_params{'name', 'location'...}
+    """This function presents a sub-menu for users who have selected to search for open positions.
+            It prompts the users to search the search and display parameters for the output.
+            Finally it calls posit_search_db to preform the search."""
+    posit_params = uif.setting_posit_search_params()
 
     # if return value is False, the user selected -b
     if not posit_params:
@@ -95,9 +99,6 @@ def search_positions_menu(db_connector):
     # if return value is False, the user selected -x
     if not posit_display_params:
         return
-
-    print("this is what you've got for positions:")
-    print(posit_params, posit_display_params)
 
     db_connector.posit_search_db(posit_params, posit_display_params)
 

@@ -3,6 +3,11 @@ import argparse
 
 
 def setting_comp_search_params():
+    """
+    This function asks for and parses user input the type of search for company to be performed.
+
+    :return: dictionary of selected parameters
+    """
     company_search = nap.NewArgParser(exit_on_error=False)
     exit_parser = nap.NewArgParser(exit_on_error=False)
     company_search.add_argument('search_parameter', type=str, choices=['n', 'l'], help="'n' to search by company name, "
@@ -19,6 +24,13 @@ def setting_comp_search_params():
     while True:
 
         try:
+            print("Please choose one of the two options:\n"
+                  "\t1. Type 'n' followed by company names separates by spaces to search for companies by name:"
+                  "\n\t\te.g. 'n comp1 comp2 comp3' (Please use underscore for spaces in company names)\n"
+                  "\t2. Type 'l' followed by locations separated by space to search for companies based on their location:\n"
+                  "\t\te.g. 'l Loc1 Loc2 Loc3' (Please use underscore for spaces in location names)"
+                  "\n Type '-h' for help and '-b' to go back to the previous menu.")
+
             options = input("Enter search parameters:")
             args, unknown = company_search.parse_known_args(options.split())
 
@@ -44,6 +56,11 @@ def setting_comp_search_params():
 
 
 def setting_display_params():
+    """
+        This function asks for and parses user input for display parameters for company search output.
+
+        :return: dictionary of selected parameters
+        """
     display_flags = nap.NewArgParser(exit_on_error=False)
     display_flags.add_argument('-d', '--d', action='store_true', help='get description')
     display_flags.add_argument('-l', '--l', action='store_true', help='get location')
@@ -55,6 +72,15 @@ def setting_display_params():
 
     while True:
         try:
+            print("Now you can choose what information you want displayed about the companies that match your search.\n"
+                  "Please use the following flags:\n"
+                  "\t'-d' to display company description\n"
+                  "\t'-l' to display company location\n"
+                  "\t'-w' to display company website\n"
+                  "\t'-p' to display all open positions in the company\n"
+                  "\t'-a' to display all of the above\n"
+                  "\t'e.g. Typing '-lw' will output companies' location and website (name always by default)\n"
+                  "Type '-h' for help and '-x' to cancel the search")
             params_input = input("Specify what information about the companies you would like to see:")
             params, unknown = display_flags.parse_known_args(params_input.split())
 
@@ -80,6 +106,11 @@ def setting_display_params():
 
 
 def setting_posit_display_params():
+    """
+           This function asks for and parses user input for display parameters for positions search output.
+
+           :return: dictionary of selected parameters
+           """
     posit_display_flags = nap.NewArgParser(exit_on_error=False)
     posit_display_flags.add_argument('-d', '--d', action='store_true', help='department')
     posit_display_flags.add_argument('-l', '--l', action='store_true', help='location')
@@ -92,6 +123,16 @@ def setting_posit_display_params():
 
     while True:
         try:
+            print("Now you can choose what information you want displayed about the positions that match your search.\n"
+                  "Please use the following flags:\n"
+                  "\t'-d' to display position department\n"
+                  "\t'-l' to position location\n"
+                  "\t'-t' to display employment type\n"
+                  "\t'-e' to display experience level\n"
+                  "\t'-s' to display position description\n"
+                  "\t'-a' to display all of the above\n"
+                  "\t'e.g. Typing '-ds' will output positions' departament and description (name and company always by default)\n"
+                  "Type '-h' for help and '-x' to cancel the search")
             params_input = input("Specify what information about the positions you would like to see:")
             params, unknown = posit_display_flags.parse_known_args(params_input.split())
 
@@ -118,6 +159,11 @@ def setting_posit_display_params():
 
 
 def setting_posit_search_params():
+    """
+               This function asks for and parses user input for parameters by which to search for open positions..
+
+               :return: dictionary of selected parameters
+               """
     print("You have selected to search for positions!")
     positions_search_parser = nap.NewArgParser(exit_on_error=False)
     positions_search_parser.add_argument('-n', '--n', type=str, nargs='+', help='by name')
@@ -132,7 +178,16 @@ def setting_posit_search_params():
     while True:
 
         try:
-            options = input("Enter search parameters:")
+            print("Please use the following flags to specify your serach parameters:\n"
+                  "Please use underscores instead of spaces in a single input argument)"
+                  "\t'-n' to search positions by title (e.g. '-n data_scientist programmist')\n"
+                  "\t'-d' to search positions by department (e.g. '-d HR')\n"
+                  "\t'-l' to search positions by location (e.g. '-l Israel Tel_Aviv')\n"
+                  "\t'-t' to search positions by employment type (e.g. '-t full_time')\n"
+                  "\t'-e' to search positions by experience level (e.g. '-e Entry-level')\n"
+                  "\t'-c' to search by company name (e.g. '-c Comp1 Comp2')\n"
+                  "Type '-h' for help and '-b' to go back to the previous menu")
+            options=input('Please type you search parameters:')
             args, unknown = positions_search_parser.parse_known_args(options.split())
 
             # returning False to return to main menu

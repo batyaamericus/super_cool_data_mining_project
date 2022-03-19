@@ -1,3 +1,3 @@
-DBUSER='root'
-DBPASSWORD='Database2021'
-DBHOST='localhost'
+DBUSER='user'
+DBPASSWORD='password'
+DBHOST='host'

@@ -9,7 +9,7 @@ import scraping_and_populating_db
 def main_menu():
     """This function displays the main menu prompting the user to selected company or positions search"""
 
-    # scraping_and_populating_db.scraping()
+    scraping_and_populating_db.scraping()
 
     db_connector = DBsearch()
     sys.stdout.write('Welcome to the Comeet Scraper!\n')

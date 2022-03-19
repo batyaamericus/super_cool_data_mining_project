@@ -1,6 +1,5 @@
 import requests
 import json
-import csv
 import config
 
 
@@ -20,6 +19,6 @@ def search_for_position_urls():
 
 def extract_company_urls():
     set_of_company_urls = set()
-    for link in finding_websites.search_for_position_urls():
+    for link in search_for_position_urls():
         set_of_company_urls.add(link.replace('/'.join(link.split('/')[-2:]), ''))
     return set_of_company_urls

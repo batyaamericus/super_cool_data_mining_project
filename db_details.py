@@ -1,11 +1,11 @@
 from sqlalchemy import Column
 from sqlalchemy import Integer
-from sqlalchemy import Boolean
 from sqlalchemy import String
-from sqlalchemy import Time
+from sqlalchemy import DateTime
 from sqlalchemy import Text
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import relationship
 
 
 # base class for all of our tables
@@ -22,6 +22,9 @@ class Company(Base):
     location = Column(String(256))
     website = Column(String(256))
 
+    positions = relationship("Position", back_populates="company", cascade="all, delete-orphan")
+    descriptions = relationship("CompanyDescription", back_populates="company", cascade="all, delete-orphan")
+
     def __repr__(self):
         return f'Company(id={self.company_uid!r}, name={self.name!r}, location={self.location!r}, website={self.website!r})'
 
@@ -32,6 +35,8 @@ class CompanyDescription(Base):
     id = Column(Integer, primary_key=True)
     company_uid = Column(String(6), ForeignKey('companies.company_uid'), nullable=False)
     description = Column(Text)
+
+    company = relationship("Company", back_populates="descriptions")
 
     def __repr__(self):
         return f'CompanyDescription(company_id={self.company_uid!r}, description={self.description!r})'
@@ -49,8 +54,11 @@ class Position(Base):
     location = Column(String(256))
     employment_type = Column(String(256))
     experience_level = Column(String(256))
-    time_updated = Column(Time)
+    time_updated = Column(DateTime)
     company_uid = Column(String(6), ForeignKey('companies.company_uid'), nullable=False)
+
+    company = relationship("Company", back_populates="positions")
+    descriptions = relationship("PositionDescription", back_populates="position", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'Position(position_id={self.position_uid!r}, position_name={self.pos_name!r}, department={self.department!r}, location={self.location!r}, employment_type={self.employment_type!r}, experience={self.experience_level!r}, time_updated={self.time_updated!r}, company_id={self.company_uid!r})'
@@ -63,6 +71,8 @@ class PositionDescription(Base):
     position_uid = Column(String(6), ForeignKey('positions.position_uid'), nullable=False)
     description_title = Column(String(256))
     description = Column(Text)
+
+    position = relationship("Position", back_populates="descriptions")
 
     def __repr__(self):
         return f'Position(id={self.id!r}, position_id={self.position_uid!r}, description_title={self.description_title!r}, description={self.description!r})'

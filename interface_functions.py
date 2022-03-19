@@ -72,7 +72,7 @@ def setting_display_params():
         flags_dic['website'] = params.w
         flags_dic['positions'] = params.p
         flags_dic['all'] = params.all
-        if all([v == False for v in flags_dic.values()]):
+        if all([v for v in flags_dic.values() if v is False]):
             print("You did not enter any display parameters. By default the program will display company website.")
             flags_dic['website'] = True
 
@@ -110,7 +110,7 @@ def setting_posit_display_params():
         flags_dic['experience level'] = params.e
         flags_dic['description'] = params.s
         flags_dic['all'] = params.all
-        if all([v == False for v in flags_dic.values()]):
+        if all([v for v in flags_dic.values() if v is False]):
             print(
                 "You did not enter any display parameters. By default the program will only display position title and company name.")
 

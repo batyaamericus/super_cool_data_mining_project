@@ -1,7 +1,7 @@
-import interface_functions as uif
 import sys
-import NewArgParser as nap
 import argparse
+import NewArgParser as nap
+import interface_functions as uif
 from db_search_functions import DBsearch
 import scraping_and_populating_db
 

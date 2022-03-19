@@ -12,7 +12,7 @@ import finding_websites
 def scraping():
     # finding relevant elements in page
     for url in finding_websites.extract_company_urls():
-        print(url)
+        print(f'processing: {url}')
         page = requests.get(url)
         if page.status_code == requests.codes.ok:
             soup = BeautifulSoup(page.content, "html.parser")

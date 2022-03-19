@@ -4,19 +4,13 @@ import json
 import re
 import finding_websites
 from sqlalchemy.orm import Session
-import database_for_comeet_jobs as db
+import db_details as db
 from datetime import datetime
 
 
 def scraping():
-    # importing job position urls from finding_websites.py and splitting them to get the company's main url
-    list_of_urls = set()
-    for link in finding_websites.extracted_urls:
-        list_of_urls.add(link.replace('/'.join(link.split('/')[-2:]), ''))
-
     # finding relevant elements in page
-    db.create_db()
-    for url in list_of_urls:
+    for url in finding_websites.extract_company_urls():
         page = requests.get(url)
         if page.status_code == requests.codes.ok:
             soup = BeautifulSoup(page.content, "html.parser")

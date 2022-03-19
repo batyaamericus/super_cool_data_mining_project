@@ -4,7 +4,6 @@ import json
 import re
 from datetime import datetime
 from sqlalchemy.orm import Session
-# from sqlalchemy import values
 from sqlalchemy.dialects.mysql import insert
 import db_details as db
 import finding_websites
@@ -28,7 +27,7 @@ def scraping():
 
                     # extracting company data
                     try:
-                        with Session(config.engine) as session:
+                        with Session(config.ENGINE_URL) as session:
                             insert_company = insert(db.Company).values(
                                 company_uid=company_data['company_uid'],
                                 name=company_data['name'],
@@ -57,7 +56,7 @@ def scraping():
                     # extracting data about positions
                     for index, position in enumerate(positions_data):
                         try:
-                            with Session(config.engine) as session:
+                            with Session(config.ENGINE_URL) as session:
                                 insert_position = insert(db.Position).values(
                                     position_uid=position['uid'],
                                     pos_name=position['name'],

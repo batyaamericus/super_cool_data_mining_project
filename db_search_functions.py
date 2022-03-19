@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, text
 import html2text
 import pandas as pd
-import CONFIG
+import config
 
 
 class DBsearch:

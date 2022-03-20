@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import json
 import re
 from datetime import datetime
+from tqdm.auto import tqdm
 from sqlalchemy.dialects.mysql import insert
 import database
 import db_details as db
@@ -11,7 +12,7 @@ import finding_websites
 
 def scraping():
     # finding relevant elements in page
-    for url in finding_websites.extract_company_urls():
+    for url in tqdm(finding_websites.extract_company_urls()):
         print(f'processing: {url}')
         page = requests.get(url)
         if page.status_code == requests.codes.ok:

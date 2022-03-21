@@ -33,3 +33,7 @@ Part 1 contains general code for collecting urls from a Google search, whereas p
     > in command line: `python user_interface_menu.py`
 9. If you would like to find more jobs that are not yet in the database, you can manually run the scraping.py file again.
 * if your operating system does not recognise the `python` command, try running `python3`
+
+## The database:
+Each time you run the scrape, information is gathered by company and stored in the comeet_jobs database as described below.
+![EER diagram](database_diagram.png)

@@ -1,18 +1,18 @@
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 import html2text
 import pandas as pd
-import config
+import database
 
 
 class DBsearch:
     def __init__(self):
-        self.engine = create_engine(config.ENGINE_URL)
+        self.engine = database.engine
         self.conn = self.engine.connect()
         self.conn.begin()
 
     def get_company_uid_from_name(self, name):
         """
-            This function gets the unique company id from the database based on the company name
+        This function gets the unique company id from the database based on the company name
 
         :param name: name of company
         :return: uid: company uid

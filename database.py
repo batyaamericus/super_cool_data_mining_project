@@ -1,5 +1,5 @@
-from sqlalchemy.exc import ProgrammingError
 from sqlalchemy_utils import create_database
+from sqlalchemy_utils import database_exists
 from sqlalchemy import create_engine
 import config
 import db_details
@@ -12,17 +12,16 @@ def create_db():
     """
     creating a database into which we will put all of the information about the jobs we will scrape
     """
-    try:
+    if not database_exists(config.ENGINE_URL):
         create_database(config.ENGINE_URL)
-    except ProgrammingError:
-        print('Database already exists')
+        print('Database exists, checking for tables...')
 
 
 def create_tables():
     """
     creates the tables in our comeet_jobs database
     """
-    db_details.Base.metadata.create_all(engine)
+    db_details.Base.metadata.create_all(engine, checkfirst=True)
 
 
 if __name__ == '__main__':

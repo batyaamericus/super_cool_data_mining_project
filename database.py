@@ -14,7 +14,6 @@ def create_db():
     """
     if not database_exists(config.ENGINE_URL):
         create_database(config.ENGINE_URL)
-        print('Database exists, checking for tables...')
 
 
 def create_tables():

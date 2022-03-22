@@ -3,7 +3,7 @@ import argparse
 import NewArgParser as nap
 import interface_functions as uif
 from db_search_functions import DBsearch
-import scraping_and_populating_db
+import scraper
 
 
 def main_menu():

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, func
+from sqlalchemy import Column, func, Boolean
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import DateTime
@@ -54,11 +54,13 @@ class Position(Base):
     position_uid = Column(String(6), primary_key=True)
     pos_name = Column(String(256), nullable=False)
     department = Column(String(256))
-    # is_remote = Column(Boolean)
-    location = Column(String(256))
+    is_remote = Column(Boolean)
+    location = Column(Text)
     employment_type = Column(String(256))
     experience_level = Column(String(256))
     time_updated = Column(DateTime)
+    comeet_pos_url = Column(String(500))
+    company_pos_url = Column(String(500))
     company_uid = Column(String(6), ForeignKey('companies.company_uid'), nullable=False)
     db_time_created = Column(DateTime(timezone=True), server_default=func.now())
     db_time_updated = Column(DateTime(timezone=True), onupdate=func.now())

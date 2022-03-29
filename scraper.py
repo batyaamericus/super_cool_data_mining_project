@@ -10,7 +10,12 @@ import db_details as db
 import finding_websites
 
 
-class ScrapeUrl:
+class CompanyUrlInfo:
+    """
+    a company's comeet page (what we want to scrape)
+    """
+    companies = {}
+    positions = {}
     def __init__(self, url):
         self.company_url = url
         self.response = requests.get(self.company_url)
@@ -20,35 +25,75 @@ class ScrapeUrl:
         else:
             raise ConnectionError(f'Unable to reach {self.company_url}')
         self.script_elements = None
-        self.company_data = {}
-        self.position_data = []
+        self.current_company = ''
+        # todo logging {url} ok, ScrapedUrl made
 
     def find_script_elements(self):
+        """
+        finds script elements within the ScrapeUrl and assigns the instance attribute
+        """
         self.script_elements = self.page.find_all('script', type='text/javascript')
-        return self.script_elements
+        # if not self.script_elements:
+        #     # todo logging script elements not found
+        # else:
+        #     # todo logging debug script elements found
 
     def find_company_element_in_scripts(self):
-        company_element = [re.search('COMPANY_DATA = ({.*})', element.get_text()) for element in self.script_elements if re.search('COMPANY_DATA = ({.*})', element.get_text())][0]
-        if company_element:
-            self.company_data = json.loads(company_element.group(1))
+        """
+        finds the element in the ScrapeUrl's scripts which contains the company info and assigns it to the instance
+        attribute
+        """
+        company_element = [re.search('COMPANY_DATA = ({.*})', element.get_text()) for element in self.script_elements if re.search('COMPANY_DATA = ({.*})', element.get_text())]
+        if not company_element:
+            # todo logging company element not found for {company_data.name}
+            pass
+        else:
+            try:
+                company_data = CompanyData(json.loads(company_element[0].group(1)))
+                self.current_company = company_data.company_uid
+                CompanyUrlInfo.companies[company_data.company_uid] = company_data
+                # todo logging company element extracted for {company_data.name}
+            except TypeError:
+                # todo logging company element could not be read for {company_data.name} because of TypeError
+                pass
 
     def find_position_element_in_scripts(self):
+        """
+        finds the element in the ScrapeUrl's scripts which contains the company's available positions info and assigns
+        it to the instance attribute
+        """
         position_element = [re.search('COMPANY_POSITIONS_DATA = (\[{.*}\])', element.get_text()) for element in self.script_elements if re.search('COMPANY_POSITIONS_DATA = (\[{.*}\])', element.get_text())][0]
-        if position_element:
-            self.position_data = json.loads(position_element.group(1))
+        if not position_element:
+            # todo logging position element not found for {position_data.name} at {self.current_company}
+            pass
+        else:
+            try:
+                positions_data = json.loads(position_element.group(1))
+                for position in positions_data:
+                    pos = PositionData(position, self.current_company)
+                    CompanyUrlInfo.positions[pos.position_uid] = pos
+                    # todo logging position element extracted for {pos.pos_name} at {self.current_company}
+            except TypeError:
+                # todo logging position element could not be read for {position_data.name} at {self.current_company} because of TypeError
+                pass
 
 
-class CompanyDataExtractor:
-    def __init__(self, scraped_url_info, database_engine):
-        self.db_engine = database_engine
+class CompanyData:
+    """
+    contains info on a company
+    """
+    def __init__(self, scraped_url_info):
         self.company_uid = scraped_url_info['company_uid']
         self.name = scraped_url_info['name']
         self.location = scraped_url_info['location']
         self.website = scraped_url_info['website']
         self.description = scraped_url_info['description']
 
-    def insert_info_into_company_tables(self):
-        with self.db_engine.connect() as conn:
+    def insert_info_into_company_tables(self, db_engine):
+        """
+        inserts the company's data into the corresponding table in our database "comeet_jobs"
+        """
+        with db_engine.connect() as conn:
             insert_company = insert(db.Company).values(
                 company_uid=self.company_uid,
                 name=self.name,
@@ -71,9 +116,11 @@ class CompanyDataExtractor:
             conn.commit()
 
 
-class PositionDataExtractor:
-    def __init__(self, scraped_url_info, database_engine, company_id):
-        self.db_engine = database_engine
+class PositionData:
+    """
+    contains info on a position
+    """
+    def __init__(self, scraped_url_info, company_id):
         self.position_uid = scraped_url_info['uid']
         self.pos_name = scraped_url_info['name']
         self.department = scraped_url_info['department']
@@ -87,8 +134,11 @@ class PositionDataExtractor:
         self.company_pos_url = scraped_url_info['url_active_page']
         self.descriptions = scraped_url_info['custom_fields']['details']
 
-    def insert_info_into_position_table(self):
-        with self.db_engine.connect() as conn:
+    def insert_info_into_position_table(self, db_engine):
+        """
+        inserts the position's data into the corresponding table in our database "comeet_jobs"
+        """
+        with db_engine.connect() as conn:
             insert_position = insert(db.Position).values(
                 position_uid=self.position_uid,
                 pos_name=self.pos_name,
@@ -117,8 +167,11 @@ class PositionDataExtractor:
             conn.execute(on_duplicate_position)
             conn.commit()
 
-    def insert_info_into_position_description_table(self):
-        with self.db_engine.connect() as conn:
+    def insert_info_into_position_description_table(self, db_engine):
+        """
+        inserts the position's descriptions into the corresponding table in our database "comeet_jobs"
+        """
+        with db_engine.connect() as conn:
             for description in self.descriptions:
                 insert_position_descriptions = insert(db.PositionDescription).values(
                     position_uid=self.position_uid,
@@ -134,33 +187,35 @@ class PositionDataExtractor:
 
 
 def scraping():
-    # finding relevant elements in page
-    for url in tqdm(finding_websites.extract_company_urls(), colour='green'):
+    """
+    takes the urls found in "finding_websites", turns then into a ScrapeUrl and then calls the functions to find the
+    script elements for the company and its positions.
+    """
+    for url in tqdm(finding_websites.extract_company_urls(), colour='green', write_bytes=False):
         print(f'processing: {url}')
         try:
-            data_from_url = ScrapeUrl(url)
+            data_from_url = CompanyUrlInfo(url)
         except ConnectionError as ex:
-            print(ex)
+            print(ex)  # todo add logging
             continue
+
         data_from_url.find_script_elements()
         data_from_url.find_company_element_in_scripts()
-        data_from_url.find_position_element_in_scripts()
+        if not data_from_url.current_company:
+            pass
+        else:
+            data_from_url.find_position_element_in_scripts()
 
-        try:
-            company_info = CompanyDataExtractor(data_from_url.company_data, database.engine)
-        except TypeError:
-            continue
 
-        company_info.insert_info_into_company_tables()
+def fill_db_tables():
+    for company in CompanyUrlInfo.companies.values():
+        company.insert_info_into_company_tables(database.engine)
 
-        for position in data_from_url.position_data:
-            try:
-                position_info = PositionDataExtractor(position, database.engine, company_info.company_uid)
-            except TypeError:
-                continue
-            position_info.insert_info_into_position_table()
-            position_info.insert_info_into_position_description_table()
+    for position in CompanyUrlInfo.positions.values():
+        position.insert_info_into_position_table(database.engine)
+        position.insert_info_into_position_description_table(database.engine)
 
 
 if __name__ == '__main__':
     scraping()
+    fill_db_tables()

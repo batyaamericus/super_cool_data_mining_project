@@ -178,9 +178,9 @@ def setting_posit_search_params():
     while True:
 
         try:
-            print("Please use the following flags to specify your serach parameters:\n"
+            print("Please use the following flags to specify your search parameters:\n"
                   "Please use underscores instead of spaces in a single input argument)"
-                  "\t'-n' to search positions by title (e.g. '-n data_scientist programmist')\n"
+                  "\t'-n' to search positions by title (e.g. '-n data_scientist programmer')\n"
                   "\t'-d' to search positions by department (e.g. '-d HR')\n"
                   "\t'-l' to search positions by location (e.g. '-l Israel Tel_Aviv')\n"
                   "\t'-t' to search positions by employment type (e.g. '-t full_time')\n"

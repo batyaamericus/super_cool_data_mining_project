@@ -28,7 +28,8 @@ class Company(Base):
     descriptions = relationship("CompanyDescription", back_populates="company", cascade="all, delete-orphan")
 
     def __repr__(self):
-        return f'Company(id={self.company_uid!r}, name={self.name!r}, location={self.location!r}, website={self.website!r})'
+        return f'Company(id={self.company_uid!r}, name={self.name!r}, location={self.location!r}, ' \
+               f'website={self.website!r})'
 
 
 class CompanyDescription(Base):
@@ -69,7 +70,10 @@ class Position(Base):
     descriptions = relationship("PositionDescription", back_populates="position", cascade="all, delete-orphan")
 
     def __repr__(self):
-        return f'Position(position_id={self.position_uid!r}, position_name={self.pos_name!r}, department={self.department!r}, location={self.location!r}, employment_type={self.employment_type!r}, experience={self.experience_level!r}, time_updated={self.time_updated!r}, company_id={self.company_uid!r})'
+        return f'Position(position_id={self.position_uid!r}, position_name={self.pos_name!r},' \
+               f'department={self.department!r}, location={self.location!r}, ' \
+               f'employment_type={self.employment_type!r}, experience={self.experience_level!r}, ' \
+               f'time_updated={self.time_updated!r}, company_id={self.company_uid!r})'
 
 
 class PositionDescription(Base):
@@ -85,4 +89,5 @@ class PositionDescription(Base):
     position = relationship("Position", back_populates="descriptions")
 
     def __repr__(self):
-        return f'Position(id={self.id!r}, position_id={self.position_uid!r}, description_title={self.description_title!r}, description={self.description!r})'
+        return f'Position(id={self.id!r}, position_id={self.position_uid!r}, ' \
+               f'description_title={self.description_title!r}, description={self.description!r})'

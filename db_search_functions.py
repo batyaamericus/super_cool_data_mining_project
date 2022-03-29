@@ -155,7 +155,7 @@ class DBsearch:
 
         if posit_params['emp_type'] is not None:
             conditions.append('LOWER(employment_type) LIKE ' + " OR LOWER(employment_type) LIKE ".join(
-                ["'%{0}%'".format(type.lower().replace('_', ' ')) for type in posit_params['emp_type']]))
+                ["'%{0}%'".format(param.lower().replace('_', ' ')) for param in posit_params['emp_type']]))
 
         if posit_params['exp_level'] is not None:
             conditions.append('LOWER(experience_level) LIKE ' + " OR LOWER(experience_level) LIKE ".join(

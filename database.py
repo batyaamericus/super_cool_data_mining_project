@@ -21,8 +21,3 @@ def create_tables():
     creates the tables in our comeet_jobs database
     """
     db_details.Base.metadata.create_all(engine, checkfirst=True)
-
-
-if __name__ == '__main__':
-    create_db()
-    create_tables()

@@ -4,6 +4,7 @@ import NewArgParser as nap
 import interface_functions as uif
 from db_search_functions import DBsearch
 import scraper
+import database
 
 
 def main_menu():
@@ -13,7 +14,8 @@ def main_menu():
     sys.stdout.write('Welcome to the Comeet Scraper!\n')
     args = None
     while True:
-        print("Please choose if you want to search for a company or for open job positions. Type'c' for the former and 'p' for the latter.\n"
+        print("Please choose if you want to search for a company or for open job positions. Type 'c' for the former and"
+              " 'p' for the latter.\n"
               "Type '-h' for help and '-q' to quit the program.")
         command = input("Enter command :")
         parser = nap.NewArgParser(exit_on_error=False)
@@ -79,7 +81,6 @@ def search_company_menu(db_connector):
         if not posit_disp_params:
             return
 
-
     db_connector.comp_search_db(comp_params, display_params, posit_disp_params)
 
 
@@ -102,4 +103,8 @@ def search_positions_menu(db_connector):
 
 
 if __name__ == '__main__':
+    database.create_db()
+    database.create_tables()
+    scraper.scraping()
+    scraper.fill_db_tables()
     main_menu()

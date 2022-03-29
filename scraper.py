@@ -16,6 +16,7 @@ class CompanyUrlInfo:
     """
     companies = {}
     positions = {}
+
     def __init__(self, url):
         self.company_url = url
         self.response = requests.get(self.company_url)
@@ -43,7 +44,8 @@ class CompanyUrlInfo:
         finds the element in the ScrapeUrl's scripts which contains the company info and assigns it to the instance
         attribute
         """
-        company_element = [re.search('COMPANY_DATA = ({.*})', element.get_text()) for element in self.script_elements if re.search('COMPANY_DATA = ({.*})', element.get_text())]
+        company_element = [re.search('COMPANY_DATA = ({.*})', element.get_text()) for element in self.script_elements
+                           if re.search('COMPANY_DATA = ({.*})', element.get_text())]
         if not company_element:
             # todo logging company element not found for {company_data.name}
             pass
@@ -62,7 +64,9 @@ class CompanyUrlInfo:
         finds the element in the ScrapeUrl's scripts which contains the company's available positions info and assigns
         it to the instance attribute
         """
-        position_element = [re.search('COMPANY_POSITIONS_DATA = (\[{.*}\])', element.get_text()) for element in self.script_elements if re.search('COMPANY_POSITIONS_DATA = (\[{.*}\])', element.get_text())][0]
+        position_element = [re.search('COMPANY_POSITIONS_DATA = (\[{.*}\])', element.get_text()) for element in
+                            self.script_elements if re.search('COMPANY_POSITIONS_DATA = (\[{.*}\])',
+                                                              element.get_text())][0]
         if not position_element:
             # todo logging position element not found for {position_data.name} at {self.current_company}
             pass
@@ -125,7 +129,8 @@ class PositionData:
         self.pos_name = scraped_url_info['name']
         self.department = scraped_url_info['department']
         self.is_remote = scraped_url_info['location']['is_remote']
-        self.location = ', '.join([k + ': ' + v for k, v in scraped_url_info['location'].items() if v and k != 'arrival_instructions' and k != 'location_uid'])
+        self.location = ', '.join([k + ': ' + v for k, v in scraped_url_info['location'].items() if v and k !=
+                                   'arrival_instructions' and k != 'location_uid'])
         self.employment_type = scraped_url_info['employment_type']
         self.experience_level = scraped_url_info['experience_level']
         self.time_updated = datetime.strptime(scraped_url_info['time_updated'], '%Y-%m-%dT%H:%M:%SZ')
@@ -214,8 +219,3 @@ def fill_db_tables():
     for position in CompanyUrlInfo.positions.values():
         position.insert_info_into_position_table(database.engine)
         position.insert_info_into_position_description_table(database.engine)
-
-
-if __name__ == '__main__':
-    scraping()
-    fill_db_tables()

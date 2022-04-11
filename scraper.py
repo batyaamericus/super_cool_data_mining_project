@@ -66,13 +66,13 @@ class CompanyUrlInfo:
         """
         position_element = [re.search('COMPANY_POSITIONS_DATA = (\[{.*}\])', element.get_text()) for element in
                             self.script_elements if re.search('COMPANY_POSITIONS_DATA = (\[{.*}\])',
-                                                              element.get_text())][0]
+                                                              element.get_text())]
         if not position_element:
             # todo logging position element not found for {position_data.name} at {self.current_company}
             pass
         else:
             try:
-                positions_data = json.loads(position_element.group(1))
+                positions_data = json.loads(position_element[0].group(1))
                 for position in positions_data:
                     pos = PositionData(position, self.current_company)
                     CompanyUrlInfo.positions[pos.position_uid] = pos

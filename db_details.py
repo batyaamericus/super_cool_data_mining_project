@@ -33,11 +33,11 @@ class ExtraCompanyInfo(Base):
     id = Column(Integer, primary_key=True)
     company_uid = Column(String(6), ForeignKey('companies.company_uid'), nullable=False)
     employee_count = Column(Integer)
-    founded = Column(DateTime)
+    founded = Column(Integer)
     headline = Column(Text)
     industry = Column(String(256))
     profiles = Column(Text)
-    company_type = Column(String(50))
+    type = Column(String(50))
 
     db_time_created = Column(DateTime(timezone=True), server_default=func.now())
     db_time_updated = Column(DateTime(timezone=True), onupdate=func.now())

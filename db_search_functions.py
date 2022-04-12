@@ -96,6 +96,21 @@ class DBsearch:
 
         return company_names
 
+    def get_dpl_profile(self, uid):
+
+        statement=text(f"SELECT employee_count, founded, headline, industry, profiles, type FROM extra_company_info WHERE company_uid='{uid}'")
+        results=self.conn.execute(statement)
+        result_dic={}
+        for result in results:
+            result_dic={'employee_count' : result[0],\
+                       'founded': result[1], 'headline': result[2],\
+                        'industry': result[3], 'profiles': result[4],\
+                        'type': result[5]}
+
+        return result_dic
+
+
+
     def comp_search_db(self, search_param, display_params, posit_disp_params):
         """
         This function performs the company search and displays the output.
@@ -119,6 +134,11 @@ class DBsearch:
                 continue
             print('Company name: ' + company_name.replace('_', ' '))
             info = self.get_company_info(uid)
+
+            if display_params['pdl'] or display_params['all']:
+                resume=self.get_dpl_profile(uid)
+                for key, val in resume.items():
+                    print(key,':',val)
 
             if display_params['location'] or display_params['all']:
                 print(info['location'])

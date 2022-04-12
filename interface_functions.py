@@ -67,6 +67,7 @@ def setting_display_params():
     display_flags.add_argument('-w', '--w', action='store_true', help='get website')
     display_flags.add_argument('-p', '--p', action='store_true', help='get positions')
     display_flags.add_argument('-a', '--all', action='store_true', help='get everything')
+    display_flags.add_argument('-f', '--f', action='store_true', help='get company profile from People Data Labs')
     display_flags.add_argument('-x', '--cancel', action='store_true', help='cancel search')
     flags_dic = {}
 
@@ -78,6 +79,7 @@ def setting_display_params():
                   "\t'-l' to display company location\n"
                   "\t'-w' to display company website\n"
                   "\t'-p' to display all open positions in the company\n"
+                  "\t'-f' to display company's profile from People Data Labs\n"
                   "\t'-a' to display all of the above\n"
                   "\t'e.g. Typing '-lw' will output companies' location and website (name always by default)\n"
                   "Type '-h' for help and '-x' to cancel the search")
@@ -97,6 +99,7 @@ def setting_display_params():
         flags_dic['location'] = params.l
         flags_dic['website'] = params.w
         flags_dic['positions'] = params.p
+        flags_dic['pdl'] = params.f
         flags_dic['all'] = params.all
         if all([v for v in flags_dic.values() if v is False]):
             print("You did not enter any display parameters. By default the program will display company website.")

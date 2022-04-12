@@ -7,13 +7,11 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import relationship
 
-
 # base class for all of our tables
 Base = declarative_base()
 
 
 # company tables
-
 class Company(Base):
     __tablename__ = 'companies'
 
@@ -27,10 +25,6 @@ class Company(Base):
     positions = relationship("Position", back_populates="company", cascade="all, delete-orphan")
     descriptions = relationship("CompanyDescription", back_populates="company", cascade="all, delete-orphan")
     extra_info = relationship("ExtraCompanyInfo", backref="company", cascade="all, delete-orphan")
-
-    def __repr__(self):
-        return f'Company(id={self.company_uid!r}, name={self.name!r}, location={self.location!r}, ' \
-               f'website={self.website!r})'
 
 
 class ExtraCompanyInfo(Base):
@@ -49,10 +43,6 @@ class ExtraCompanyInfo(Base):
     db_time_updated = Column(DateTime(timezone=True), onupdate=func.now())
 
     company = relationship("Company", back_populates="extra_info")
-
-    def __repr__(self):
-        return f'Company(id={self.company_uid!r}, name={self.name!r}, location={self.location!r}, ' \
-               f'website={self.website!r})'
 
 
 # extra descriptions from API
@@ -90,12 +80,6 @@ class Position(Base):
     company = relationship("Company", back_populates="positions")
     descriptions = relationship("PositionDescription", back_populates="position", cascade="all, delete-orphan")
 
-    def __repr__(self):
-        return f'Position(position_id={self.position_uid!r}, position_name={self.pos_name!r},' \
-               f'department={self.department!r}, location={self.location!r}, ' \
-               f'employment_type={self.employment_type!r}, experience={self.experience_level!r}, ' \
-               f'time_updated={self.time_updated!r}, company_id={self.company_uid!r})'
-
 
 class PositionDescription(Base):
     __tablename__ = 'position_description'
@@ -108,7 +92,3 @@ class PositionDescription(Base):
     db_time_updated = Column(DateTime(timezone=True), onupdate=func.now())
 
     position = relationship("Position", back_populates="descriptions")
-
-    def __repr__(self):
-        return f'Position(id={self.id!r}, position_id={self.position_uid!r}, ' \
-               f'description_title={self.description_title!r}, description={self.description!r})'

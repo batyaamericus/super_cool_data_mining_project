@@ -26,12 +26,36 @@ class Company(Base):
 
     positions = relationship("Position", back_populates="company", cascade="all, delete-orphan")
     descriptions = relationship("CompanyDescription", back_populates="company", cascade="all, delete-orphan")
+    extra_info = relationship("ExtraCompanyInfo", backref="company", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'Company(id={self.company_uid!r}, name={self.name!r}, location={self.location!r}, ' \
                f'website={self.website!r})'
 
 
+class ExtraCompanyInfo(Base):
+    __tablename__ = 'extra_company_info'
+
+    id = Column(Integer, primary_key=True)
+    company_uid = Column(String(6), ForeignKey('companies.company_uid'), nullable=False)
+    employee_count = Column(Integer)
+    founded = Column()
+    headline = Column(Text)
+    industry = Column(String(256))
+    profiles = Column(Text)
+    company_type = Column(String(50))
+
+    db_time_created = Column(DateTime(timezone=True), server_default=func.now())
+    db_time_updated = Column(DateTime(timezone=True), onupdate=func.now())
+
+    company = relationship("Company", back_populates="extra_info")
+
+    def __repr__(self):
+        return f'Company(id={self.company_uid!r}, name={self.name!r}, location={self.location!r}, ' \
+               f'website={self.website!r})'
+
+
+# extra descriptions from API
 class CompanyDescription(Base):
     __tablename__ = 'company_description'
 
@@ -42,9 +66,6 @@ class CompanyDescription(Base):
     db_time_updated = Column(DateTime(timezone=True), onupdate=func.now())
 
     company = relationship("Company", back_populates="descriptions")
-
-    def __repr__(self):
-        return f'CompanyDescription(company_id={self.company_uid!r}, description={self.description!r})'
 
 
 # positions tables

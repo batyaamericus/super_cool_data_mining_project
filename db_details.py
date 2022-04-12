@@ -33,7 +33,7 @@ class ExtraCompanyInfo(Base):
     id = Column(Integer, primary_key=True)
     company_uid = Column(String(6), ForeignKey('companies.company_uid'), nullable=False)
     employee_count = Column(Integer)
-    founded = Column()
+    founded = Column(DateTime)
     headline = Column(Text)
     industry = Column(String(256))
     profiles = Column(Text)

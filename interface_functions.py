@@ -1,6 +1,6 @@
 import NewArgParser as nap
 import argparse
-
+import config as CONF
 
 def setting_comp_search_params():
     """
@@ -8,6 +8,9 @@ def setting_comp_search_params():
 
     :return: dictionary of selected parameters
     """
+
+    CONF.MENU_LOGGER.info(f"Entering setting_comp_search_params menu")
+    
     company_search = nap.NewArgParser(exit_on_error=False)
     exit_parser = nap.NewArgParser(exit_on_error=False)
     company_search.add_argument('search_parameter', type=str, choices=['n', 'l'], help="'n' to search by company name, "
@@ -22,7 +25,7 @@ def setting_comp_search_params():
     param_dic = {'name': None, 'location': None}
 
     while True:
-
+        CONF.MENU_LOGGER.debug(f"Entering while loop")
         try:
             print("Please choose one of the two options:\n"
                   "\t1. Type 'n' followed by company names separates by spaces to search for companies by name:"
@@ -32,10 +35,12 @@ def setting_comp_search_params():
                   "\n Type '-h' for help and '-b' to go back to the previous menu.")
 
             options = input("Enter search parameters:")
+            CONF.MENU_LOGGER.debug(f"User input: {options}")
             args, unknown = company_search.parse_known_args(options.split())
 
             # returning False to return to main menu
             if args.back:
+                CONF.MENU_LOGGER.debug(f"Returning False")
                 return False
 
             if args.search_parameter == 'n':
@@ -43,12 +48,15 @@ def setting_comp_search_params():
             else:
                 param_dic['location'] = args.input
 
+            CONF.MENU_LOGGER.debug(f"Returning {param_dic}")
             return param_dic
 
         except argparse.ArgumentError as error:
             exit_bool, unknown = exit_parser.parse_known_args(options.split())
             if exit_bool.back:
+                CONF.MENU_LOGGER.debug(f"Returning False")
                 return False
+            CONF.MENU_LOGGER.error(f"{error}")
             print(error, "Try again or type '-b' to go back.")
             continue
         except SystemExit:
@@ -61,6 +69,8 @@ def setting_display_params():
 
         :return: dictionary of selected parameters
         """
+    CONF.MENU_LOGGER.info(f"Entering setting_display_params menu")
+
     display_flags = nap.NewArgParser(exit_on_error=False)
     display_flags.add_argument('-d', '--d', action='store_true', help='get description')
     display_flags.add_argument('-l', '--l', action='store_true', help='get location')
@@ -72,6 +82,7 @@ def setting_display_params():
     flags_dic = {}
 
     while True:
+        CONF.MENU_LOGGER.debug(f"Entering while loop")
         try:
             print("Now you can choose what information you want displayed about the companies that match your search.\n"
                   "Please use the following flags:\n"
@@ -84,15 +95,18 @@ def setting_display_params():
                   "\t'e.g. Typing '-lw' will output companies' location and website (name always by default)\n"
                   "Type '-h' for help and '-x' to cancel the search")
             params_input = input("Specify what information about the companies you would like to see:")
+            CONF.MENU_LOGGER.debug(f"User input: {params_input}")
             params, unknown = display_flags.parse_known_args(params_input.split())
 
         except argparse.ArgumentError as error:
             print(error, "Try again or type '-x' to cancel the search")
+            CONF.MENU_LOGGER.error(f"{error}")
             continue
         except SystemExit:
             continue
 
         if params.cancel:
+            CONF.MENU_LOGGER.debug(f"Returning False")
             return False
 
         flags_dic['description'] = params.d
@@ -105,6 +119,7 @@ def setting_display_params():
             print("You did not enter any display parameters. By default the program will display company website.")
             flags_dic['website'] = True
 
+        CONF.MENU_LOGGER.debug(f"Returning {flags_dic}")
         return flags_dic
 
 
@@ -114,6 +129,9 @@ def setting_posit_display_params():
 
            :return: dictionary of selected parameters
            """
+
+    CONF.MENU_LOGGER.info(f"Entering setting_posit_display_params menu")
+
     posit_display_flags = nap.NewArgParser(exit_on_error=False)
     posit_display_flags.add_argument('-d', '--d', action='store_true', help='department')
     posit_display_flags.add_argument('-l', '--l', action='store_true', help='location')
@@ -125,6 +143,7 @@ def setting_posit_display_params():
     flags_dic = {}
 
     while True:
+        CONF.MENU_LOGGER.debug(f"Entering while loop")
         try:
             print("Now you can choose what information you want displayed about the positions that match your search.\n"
                   "Please use the following flags:\n"
@@ -137,15 +156,21 @@ def setting_posit_display_params():
                   "\t'e.g. Typing '-ds' will output positions' departament and description (name and company always by default)\n"
                   "Type '-h' for help and '-x' to cancel the search")
             params_input = input("Specify what information about the positions you would like to see:")
+
+            CONF.MENU_LOGGER.debug(f"User input: {params_input}")
+
+
             params, unknown = posit_display_flags.parse_known_args(params_input.split())
 
         except argparse.ArgumentError as error:
             print(error, "Try again or type '-x' to cancel the search")
+            CONF.MENU_LOGGER.error(f"{error}")
             continue
         except SystemExit:
             continue
 
         if params.cancel:
+            CONF.MENU_LOGGER.debug(f"Returning False")
             return False
 
         flags_dic['department'] = params.d
@@ -158,6 +183,7 @@ def setting_posit_display_params():
             print(
                 "You did not enter any display parameters. By default the program will only display position title and company name.")
 
+        CONF.MENU_LOGGER.debug(f"Returning: {flags_dic}")
         return flags_dic
 
 
@@ -167,6 +193,8 @@ def setting_posit_search_params():
 
                :return: dictionary of selected parameters
                """
+    CONF.MENU_LOGGER.info(f"Entering setting_posit_search_params menu")
+
     print("You have selected to search for positions!")
     positions_search_parser = nap.NewArgParser(exit_on_error=False)
     positions_search_parser.add_argument('-n', '--n', type=str, nargs='+', help='by name')
@@ -179,6 +207,7 @@ def setting_posit_search_params():
     param_dic = {}
 
     while True:
+        CONF.MENU_LOGGER.debug(f"Entering while loop")
 
         try:
             print("Please use the following flags to specify your search parameters:\n"
@@ -191,10 +220,12 @@ def setting_posit_search_params():
                   "\t'-c' to search by company name (e.g. '-c Comp1 Comp2')\n"
                   "Type '-h' for help and '-b' to go back to the previous menu")
             options = input('Please type you search parameters:')
+            CONF.MENU_LOGGER.debug(f"User input: {options}")
             args, unknown = positions_search_parser.parse_known_args(options.split())
 
             # returning False to return to main menu
             if args.back:
+                CONF.MENU_LOGGER.debug(f"Returning False")
                 return False
 
             param_dic['name'] = args.n
@@ -208,10 +239,12 @@ def setting_posit_search_params():
                 print("You did not enter any search parameters. Try again or type '-b' to go back.")
                 continue
 
+            CONF.MENU_LOGGER.debug(f"Returning: {param_dic}")
             return param_dic
 
         except argparse.ArgumentError as error:
             print(error, "Try again or type '-b' to go back.")
+            CONF.MENU_LOGGER.error(f"{error}")
             continue
         except SystemExit:
             continue

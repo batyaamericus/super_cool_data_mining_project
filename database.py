@@ -4,7 +4,7 @@ from sqlalchemy_utils import database_exists
 from sqlalchemy import create_engine
 import config
 import db_details
-import config
+import db_setup_logger from config
 
 
 engine = create_engine(config.ENGINE_URL, future=True)
@@ -15,9 +15,9 @@ def create_db():
     creating a database into which we will put all of the information about the jobs we will scrape
     """
     if not database_exists(config.ENGINE_URL):
-        logging.info('database did not exist, creating it')
+        db_setup_logger.info('database did not exist, creating it')
         create_database(config.ENGINE_URL)
-    logging.info('database exists, no action taken')
+    db_setup_logger.info('database exists, no action taken')
 
 
 def create_tables():

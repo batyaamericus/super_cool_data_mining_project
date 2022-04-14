@@ -7,7 +7,7 @@ from sqlalchemy import Text
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import relationship
-import config
+import db_setup_logger from config
 
 # base class for all of our tables
 Base = declarative_base()
@@ -16,7 +16,7 @@ Base = declarative_base()
 # company tables
 class Company(Base):
     __tablename__ = 'companies'
-    logging.info(f'creating {__tablename__}')
+    db_setup_logger.info(f'creating {__tablename__}')
 
     company_uid = Column(String(6), primary_key=True)
     name = Column(String(256))
@@ -29,12 +29,12 @@ class Company(Base):
     descriptions = relationship("CompanyDescription", back_populates="company", cascade="all, delete-orphan")
     extra_info = relationship("ExtraCompanyInfo", backref="company", cascade="all, delete-orphan")
 
-    logging.info(f'{__tablename__} created')
+    db_setup_logger.info(f'{__tablename__} created')
 
 
 class ExtraCompanyInfo(Base):
     __tablename__ = 'extra_company_info'
-    logging.info(f'creating {__tablename__}')
+    db_setup_logger.info(f'creating {__tablename__}')
 
     id = Column(Integer, primary_key=True)
     company_uid = Column(String(6), ForeignKey('companies.company_uid'), nullable=False)
@@ -49,13 +49,13 @@ class ExtraCompanyInfo(Base):
     db_time_updated = Column(DateTime(timezone=True), onupdate=func.now())
 
     company = relationship("Company", back_populates="extra_info")
-    logging.info(f'{__tablename__} created')
+    db_setup_logger.info(f'{__tablename__} created')
 
 
 # extra descriptions from API
 class CompanyDescription(Base):
     __tablename__ = 'company_description'
-    logging.info(f'creating {__tablename__}')
+    db_setup_logger.info(f'creating {__tablename__}')
 
     id = Column(Integer, primary_key=True)
     company_uid = Column(String(6), ForeignKey('companies.company_uid'), nullable=False)
@@ -64,13 +64,13 @@ class CompanyDescription(Base):
     db_time_updated = Column(DateTime(timezone=True), onupdate=func.now())
 
     company = relationship("Company", back_populates="descriptions")
-    logging.info(f'{__tablename__} created')
+    db_setup_logger.info(f'{__tablename__} created')
 
 
 # positions tables
 class Position(Base):
     __tablename__ = 'positions'
-    logging.info(f'creating {__tablename__}')
+    db_setup_logger.info(f'creating {__tablename__}')
 
     position_uid = Column(String(6), primary_key=True)
     pos_name = Column(String(256), nullable=False)
@@ -88,12 +88,12 @@ class Position(Base):
 
     company = relationship("Company", back_populates="positions")
     descriptions = relationship("PositionDescription", back_populates="position", cascade="all, delete-orphan")
-    logging.info(f'{__tablename__} created')
+    db_setup_logger.info(f'{__tablename__} created')
 
 
 class PositionDescription(Base):
     __tablename__ = 'position_description'
-    logging.info(f'creating {__tablename__}')
+    db_setup_logger.info(f'creating {__tablename__}')
 
     id = Column(Integer, primary_key=True)
     position_uid = Column(String(6), ForeignKey('positions.position_uid'), nullable=False)
@@ -103,4 +103,4 @@ class PositionDescription(Base):
     db_time_updated = Column(DateTime(timezone=True), onupdate=func.now())
 
     position = relationship("Position", back_populates="descriptions")
-    logging.info(f'{__tablename__} created')
+    db_setup_logger.info(f'{__tablename__} created')

@@ -125,7 +125,9 @@ class DBsearch:
         CONF.MENU_LOGGER.debug(f"Successful execution of an SQL query to the database")
 
         for result in results:
-            CONF.MENU_LOGGER.debug(f"Returning (discription=): {html2text.html2text(result[0])}")
+            CONF.MENU_LOGGER.debug(f"Returning (description)")
+            if result[0] is None:
+                return ''
             return html2text.html2text(result[0])
 
     def get_companies_by_loc(self, locations):
@@ -301,7 +303,9 @@ class DBsearch:
 
         CONF.MENU_LOGGER.debug(f"Successful execution of an SQL query to the database")
         for result in results:
-            CONF.MENU_LOGGER.debug(f"Returning {html2text.html2text(result[0])}")
+            CONF.MENU_LOGGER.debug(f"Returning")
+            if result[0] is None:
+                return ''
             return html2text.html2text(result[0])
 
     def posit_search_db(self, posit_params, posit_display_params):

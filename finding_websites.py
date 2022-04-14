@@ -1,4 +1,3 @@
-import logging
 import requests
 import json
 from config import db_setup_logger
@@ -18,7 +17,7 @@ def search_for_position_urls():
     finding comeet job position urls using a google API
     :return extracted_urls:
     """
-    logging.debug(f'sending initial Google api request')
+    db_setup_logger.debug(f'sending initial Google api request')
     google_response = requests.get(GOOGLE_API_URL, headers=GOOGLE_API_HEADERS)
     if google_response.status_code == requests.codes.ok:
         db_setup_logger.info(f'initial Google api request received (status code 200)')

@@ -1,26 +1,20 @@
 import requests
-import json
-import database
 from db_search_functions import DBsearch
 from sqlalchemy import text
-from datetime import datetime
+from config import db_setup_logger
 
 
 def api_enrichment():
+    db = DBsearch()
+    conn = db.conn
 
-    db= DBsearch()
-    conn=db.conn
+    statement = text("SELECT name FROM companies")
 
-    statement=text("SELECT name FROM companies")
-
-    company_names=[]
-    results= conn.execute(statement)
+    company_names = []
+    results = conn.execute(statement)
 
     for result in results:
         company_names.append(result[0])
-
-
-
 
     API_KEY = "2ebf58a45a2e8784aa697aa6bfcd6a580e664d42c473c88745f656a27145f975"
 
@@ -38,13 +32,13 @@ def api_enrichment():
       'size': 10,
       'pretty': True
     }
-
+    db_setup_logger.debug(f'sending initial PDL api request')
     response = requests.get(
       PDL_URL,
       headers=H,
       params=P
     ).json()
-    print(response)
+    db_setup_logger.info(f'initial PDL api request received status code: {response["status"]}')
     return response
 
 
@@ -72,7 +66,7 @@ def add_info_to_db(response):
                         statement = text(f"UPDATE extra_company_info SET {tag}='{'; '.join(data[i][tag])}' WHERE company_uid='{uid}'")
                         conn.execute(statement)
                         conn.commit()
-                elif tag=='employee_count' or tag=='founded':
+                elif tag == 'employee_count' or tag == 'founded':
                     if not data[i][tag] is None:
                         statement = text(f"UPDATE extra_company_info SET {tag}={data[i][tag]} WHERE company_uid='{uid}'")
                         conn.execute(statement)
@@ -83,8 +77,7 @@ def add_info_to_db(response):
                         conn.execute(statement)
                         conn.commit()
 
-
-
+        db_setup_logger.info(f'successfully enriched table with information from PDL api')
     else:
         print("NOTE. The carrier pigeons lost motivation in flight. See error and try again.")
         print("error:", response)

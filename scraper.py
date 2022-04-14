@@ -1,4 +1,3 @@
-import logging
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -81,8 +80,8 @@ class CompanyUrlInfo:
                 try:
                     pos = PositionData(position, self.current_company)
                     CompanyUrlInfo.positions[pos.position_uid] = pos
-                    db_setup_logger.info(f'position element extracted and PositionData made for {pos.pos_name} at '
-                                 f'{self.current_company}')
+                    db_setup_logger.info(f'position element extracted and PositionData made for position {i+1}/{num_pos}'
+                                         f' at {self.current_company}')
                 except TypeError:
                     db_setup_logger.warning(f'position element could not be read for position {i+1}/{num_pos} at '
                                     f'{self.current_company} because of TypeError')
@@ -236,7 +235,7 @@ def scraping():
 
 
 def fill_db_tables():
-    logging.debug('FILLING DB TABLES')
+    db_setup_logger.debug('FILLING DB TABLES')
     for company in CompanyUrlInfo.companies.values():
         company.insert_info_into_company_tables(database.engine)
 

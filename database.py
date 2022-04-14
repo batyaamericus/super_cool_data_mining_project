@@ -1,4 +1,3 @@
-import logging
 from sqlalchemy_utils import create_database
 from sqlalchemy_utils import database_exists
 from sqlalchemy import create_engine

@@ -1,4 +1,3 @@
-import logging
 from sqlalchemy import Column, func, Boolean
 from sqlalchemy import Integer
 from sqlalchemy import String

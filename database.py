@@ -4,7 +4,7 @@ from sqlalchemy_utils import database_exists
 from sqlalchemy import create_engine
 import config
 import db_details
-import db_setup_logger from config
+from config import db_setup_logger
 
 
 engine = create_engine(config.ENGINE_URL, future=True)

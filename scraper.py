@@ -9,7 +9,7 @@ from sqlalchemy.dialects.mysql import insert
 import database
 import db_details as db
 import finding_websites
-import db_setup_logger from config
+from config  import db_setup_logger
 
 
 class CompanyUrlInfo:

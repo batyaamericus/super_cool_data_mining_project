@@ -10,18 +10,12 @@ HOST = os.environ['host']
 ENGINE_URL = f'mysql+pymysql://{USER_NAME}:{PASSWORD}@{HOST}/comeet_jobs'
 
 '''LOGGING'''
-
 db_setup_logger = logging.getLogger('db_setup')
 formatter = logging.Formatter('%(asctime)s-%(levelname)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s')
 db_output_file_handler = logging.FileHandler('db_setup.log')
 db_setup_logger.addHandler(db_output_file_handler)
 db_setup_logger.setLevel(logging.INFO)
 
-# basicConfig code example
-# logging.basicConfig(filename='db_setup.log',
-#                     format='%(asctime)s-%(levelname)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s',
-#                     level=logging.INFO)
-#
 MENU_LOGGER = logging.getLogger('menu')
 output_file_handler = logging.FileHandler('user_interface.log')
 output_file_handler.setFormatter(formatter)

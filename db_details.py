@@ -7,7 +7,7 @@ from sqlalchemy import Text
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import relationship
-import db_setup_logger from config
+from config import db_setup_logger
 
 # base class for all of our tables
 Base = declarative_base()

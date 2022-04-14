@@ -1,7 +1,7 @@
 import logging
 import requests
 import json
-import db_setup_logger from config
+from config import db_setup_logger
 
 
 GOOGLE_API_URL = "https://google-search3.p.rapidapi.com/api/v1/search/q=data+scientist+site:www.comeet.com/jobs&num=100"

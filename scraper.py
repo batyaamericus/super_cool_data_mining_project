@@ -1,3 +1,4 @@
+import logging
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -8,6 +9,7 @@ from sqlalchemy.dialects.mysql import insert
 import database
 import db_details as db
 import finding_websites
+import config
 
 
 class CompanyUrlInfo:
@@ -18,26 +20,28 @@ class CompanyUrlInfo:
     positions = {}
 
     def __init__(self, url):
+        logging.debug(f'trying to make CompanyUrlInfo from {url}')
         self.company_url = url
         self.response = requests.get(self.company_url)
         self.page = None
         if self.response.status_code == requests.codes.ok:
             self.page = BeautifulSoup(self.response.content, "html.parser")
         else:
+            logging.critical(f'unable to connect to {self.company_url}')
             raise ConnectionError(f'Unable to reach {self.company_url}')
         self.script_elements = None
         self.current_company = ''
-        # todo logging {url} ok, ScrapedUrl made
+        logging.info(f'{url} ok, CompanyUrlInfo created successfully')
 
     def find_script_elements(self):
         """
         finds script elements within the ScrapeUrl and assigns the instance attribute
         """
         self.script_elements = self.page.find_all('script', type='text/javascript')
-        # if not self.script_elements:
-        #     # todo logging script elements not found
-        # else:
-        #     # todo logging debug script elements found
+        if not self.script_elements:
+            logging.warning(f'no script elements were found for {self.company_url}')
+        else:
+            logging.info(f'script elements extracted for {self.company_url}')
 
     def find_company_element_in_scripts(self):
         """
@@ -47,16 +51,16 @@ class CompanyUrlInfo:
         company_element = [re.search('COMPANY_DATA = ({.*})', element.get_text()) for element in self.script_elements
                            if re.search('COMPANY_DATA = ({.*})', element.get_text())]
         if not company_element:
-            # todo logging company element not found for {company_data.name}
+            logging.warning(f'no company element was found in page')
             pass
         else:
             try:
                 company_data = CompanyData(json.loads(company_element[0].group(1)))
                 self.current_company = company_data.company_uid
                 CompanyUrlInfo.companies[company_data.company_uid] = company_data
-                # todo logging company element extracted for {company_data.name}
+                logging.info(f'company element extracted and CompanyUrlInfo made for {company_data.name}')
             except TypeError:
-                # todo logging company element could not be read for {company_data.name} because of TypeError
+                logging.warning(f'company element could not be read for {self.company_url} because of TypeError')
                 pass
 
     def find_position_element_in_scripts(self):
@@ -68,18 +72,21 @@ class CompanyUrlInfo:
                             self.script_elements if re.search('COMPANY_POSITIONS_DATA = (\[{.*}\])',
                                                               element.get_text())]
         if not position_element:
-            # todo logging position element not found for {position_data.name} at {self.current_company}
+            logging.warning(f'no position elements were found for {self.current_company}')
             pass
         else:
-            try:
-                positions_data = json.loads(position_element[0].group(1))
-                for position in positions_data:
+            positions_data = json.loads(position_element[0].group(1))
+            num_pos = len(positions_data)
+            for i, position in enumerate(positions_data):
+                try:
                     pos = PositionData(position, self.current_company)
                     CompanyUrlInfo.positions[pos.position_uid] = pos
-                    # todo logging position element extracted for {pos.pos_name} at {self.current_company}
-            except TypeError:
-                # todo logging position element could not be read for {position_data.name} at {self.current_company} because of TypeError
-                pass
+                    logging.info(f'position element extracted and PositionData made for {pos.pos_name} at '
+                                 f'{self.current_company}')
+                except TypeError:
+                    logging.warning(f'position element could not be read for position {i+1}/{num_pos} at '
+                                    f'{self.current_company} because of TypeError')
+                    continue
 
 
 class CompanyData:
@@ -108,6 +115,8 @@ class CompanyData:
                 name=insert_company.inserted.name, location=insert_company.inserted.location,
                 website=insert_company.inserted.website)
 
+            logging.debug(f'sql statement prepared for company: {self.company_uid}')
+
             insert_company_description = insert(db.CompanyDescription).values(
                 company_uid=self.company_uid,
                 description=self.description
@@ -115,9 +124,14 @@ class CompanyData:
             on_duplicate_description = insert_company_description.on_duplicate_key_update(
                 description=self.description)
 
+            logging.debug(f'sql statement prepared for description for company: {self.company_uid}')
+
             conn.execute(on_duplicate_company)
+            logging.debug(f'sql statement for company executed')
             conn.execute(on_duplicate_description)
+            logging.debug(f'sql statement for description for company executed')
             conn.commit()
+            logging.debug(f'sql statement for company and its description has been committed')
 
 
 class PositionData:
@@ -168,9 +182,12 @@ class PositionData:
                 comeet_pos_url=self.comeet_pos_url,
                 company_pos_url=self.company_pos_url
             )
+            logging.debug(f'sql statement prepared for position: {self.position_uid}')
 
             conn.execute(on_duplicate_position)
+            logging.debug(f'sql statement for position executed')
             conn.commit()
+            logging.debug(f'sql statement for position has been committed')
 
     def insert_info_into_position_description_table(self, db_engine):
         """
@@ -186,9 +203,12 @@ class PositionData:
                 on_duplicate_position_description = insert_position_descriptions.on_duplicate_key_update(
                     description_title=insert_position_descriptions.inserted.description_title,
                     description=insert_position_descriptions.inserted.description)
+                logging.debug(f'sql statement prepared for description for position: {self.position_uid}')
 
                 conn.execute(on_duplicate_position_description)
+                logging.debug(f'sql statement for description for position executed')
                 conn.commit()
+                logging.debug(f'sql statement for description for position has been committed')
 
 
 def scraping():
@@ -196,12 +216,13 @@ def scraping():
     takes the urls found in "finding_websites", turns then into a ScrapeUrl and then calls the functions to find the
     script elements for the company and its positions.
     """
-    for url in tqdm(finding_websites.extract_company_urls(), colour='green', write_bytes=False):
+    logging.debug('SCRAPER RUNNING')
+    for i, url in enumerate(tqdm(finding_websites.extract_company_urls(), colour='green', write_bytes=False)):
         print(f'processing: {url}')
         try:
             data_from_url = CompanyUrlInfo(url)
         except ConnectionError as ex:
-            print(ex)  # todo add logging
+            print(ex)
             continue
 
         data_from_url.find_script_elements()
@@ -211,11 +232,16 @@ def scraping():
         else:
             data_from_url.find_position_element_in_scripts()
 
+    logging.info(f'{len(CompanyUrlInfo.companies)}/{i} companies extracted from potential company links')
+
 
 def fill_db_tables():
+    logging.debug('FILLING DB TABLES')
     for company in CompanyUrlInfo.companies.values():
         company.insert_info_into_company_tables(database.engine)
 
     for position in CompanyUrlInfo.positions.values():
         position.insert_info_into_position_table(database.engine)
         position.insert_info_into_position_description_table(database.engine)
+
+    logging.info(f'completed successfully, database filled')

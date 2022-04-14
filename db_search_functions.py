@@ -2,6 +2,8 @@ from sqlalchemy import text
 import html2text
 import pandas as pd
 import database
+import config as CONF
+from sqlalchemy.exc import DBAPIError, SQLAlchemyError
 
 
 class DBsearch:
@@ -9,23 +11,38 @@ class DBsearch:
         self.engine = database.engine
         self.conn = self.engine.connect()
         self.conn.begin()
-
+        CONF.MENU_LOGGER.debug(f"DBsearch class instantiated. Connection to the database successfully opened. ")
+        
     def get_company_uid_from_name(self, name):
         """
         This function gets the unique company id from the database based on the company name
+
 
         :param name: name of company
         :return: uid: company uid
         """
         uid = None
-
+        
         statement = f"SELECT company_uid FROM companies WHERE LOWER(name) LIKE '%{name}%'"
         ins = text(statement)
 
-        results = self.conn.execute(ins)
+        try:
+            results = self.conn.execute(ins)
+        except SQLAlchemyError as e:
+            print(e)
+            CONF.MENU_LOGGER.critical(f"{e}")
+            raise SQLAlchemyError(f"{e._message()}")
+        except DBAPIError as e2:
+            print(e2)
+            CONF.MENU_LOGGER.critical(f"{e2}")
+            raise DBAPIError(f"{e2.message()}")
+
+
+        CONF.MENU_LOGGER.debug(f"Successful execution of an SQL query to the database")
         for result in results:
             uid = result[0]
 
+        CONF.MENU_LOGGER.debug(f"Returning (uid=): {uid}")
         return uid
 
     def get_company_name_from_uid(self, uid):
@@ -39,8 +56,20 @@ class DBsearch:
         statement = f"SELECT name FROM companies WHERE company_uid='{uid}'"
         ins = text(statement)
 
-        results = self.conn.execute(ins)
+        try:
+            results = self.conn.execute(ins)
+        except SQLAlchemyError as e:
+            print(e)
+            CONF.MENU_LOGGER.critical(f"{e}")
+            raise SQLAlchemyError(f"{e._message()}")
+        except DBAPIError as e2:
+            print(e2)
+            CONF.MENU_LOGGER.critical(f"{e2}")
+            raise DBAPIError(f"{e2.message()}")
+
+        CONF.MENU_LOGGER.debug(f"Successful execution of an SQL query to the database")
         for result in results:
+            CONF.MENU_LOGGER.debug(f"Returning (name=): {result[0]}")
             return result[0]
 
     def get_company_info(self, uid):
@@ -54,10 +83,22 @@ class DBsearch:
         statement = f"SELECT location, website FROM companies WHERE company_uid='{uid}'"
         ins = text(statement)
 
-        # making connection
-        results = self.conn.execute(ins)
+        try:
+            results = self.conn.execute(ins)
+        except SQLAlchemyError as e:
+            print(e)
+            CONF.MENU_LOGGER.critical(f"{e}")
+            raise SQLAlchemyError(f"{e._message()}")
+        except DBAPIError as e2:
+            print(e2)
+            CONF.MENU_LOGGER.critical(f"{e2}")
+            raise DBAPIError(f"{e2.message()}")
+
+        CONF.MENU_LOGGER.debug(f"Successful execution of an SQL query to the database")
+        
         for result in results:
             info = {'location': '\tCompany location: ' + result[0], 'website': '\tCompany website: ' + result[1]}
+            CONF.MENU_LOGGER.debug(f"Returning (info=): {info} ")
             return info
 
     def get_company_description(self, uid):
@@ -70,9 +111,21 @@ class DBsearch:
         statement = f"SELECT description FROM company_description WHERE company_uid='{uid}'"
         ins = text(statement)
 
-        # making connection
-        results = self.conn.execute(ins)
+        try:
+            results = self.conn.execute(ins)
+        except SQLAlchemyError as e:
+            print(e)
+            CONF.MENU_LOGGER.critical(f"{e}")
+            raise SQLAlchemyError(f"{e._message()}")
+        except DBAPIError as e2:
+            print(e2)
+            CONF.MENU_LOGGER.critical(f"{e2}")
+            raise DBAPIError(f"{e2.message()}")
+
+        CONF.MENU_LOGGER.debug(f"Successful execution of an SQL query to the database")
+
         for result in results:
+            CONF.MENU_LOGGER.debug(f"Returning (discription=): {html2text.html2text(result[0])}")
             return html2text.html2text(result[0])
 
     def get_companies_by_loc(self, locations):
@@ -85,21 +138,46 @@ class DBsearch:
 
         company_names = []
         for location in locations:
+            CONF.MENU_LOGGER.debug(f"Searching for companies located in {location}")
             location = location.lower().replace('_', ' ')
             statement = f"SELECT name FROM companies WHERE LOWER(location) LIKE '%{location}%'"
             ins = text(statement)
 
-            # making connection
-            results = self.conn.execute(ins)
+
+            try:
+                results = self.conn.execute(ins)
+            except SQLAlchemyError as e:
+                print(e)
+                CONF.MENU_LOGGER.critical(f"{e}")
+                raise SQLAlchemyError(f"{e._message()}")
+            except DBAPIError as e2:
+                print(e2)
+                CONF.MENU_LOGGER.critical(f"{e2}")
+                raise DBAPIError(f"{e2.message()}")
+
+            CONF.MENU_LOGGER.debug(f"Successful execution of an SQL query to the database.")
             for result in results:
                 company_names.append(result[0])
 
+        CONF.MENU_LOGGER.debug(f"Returning (company names=): {company_names}")
         return company_names
 
     def get_dpl_profile(self, uid):
 
         statement=text(f"SELECT employee_count, founded, headline, industry, profiles, type FROM extra_company_info WHERE company_uid='{uid}'")
-        results=self.conn.execute(statement)
+
+        try:
+            results = self.conn.execute(statement)
+        except SQLAlchemyError as e:
+            print(e)
+            CONF.MENU_LOGGER.critical(f"{e}")
+            raise SQLAlchemyError(f"{e._message()}")
+        except DBAPIError as e2:
+            print(e2)
+            CONF.MENU_LOGGER.critical(f"{e2}")
+            raise DBAPIError(f"{e2.message()}")
+
+        CONF.MENU_LOGGER.debug(f"Successful execution of an SQL query to the database.")
         result_dic={}
         for result in results:
             result_dic={'employee_count' : result[0],\
@@ -107,6 +185,7 @@ class DBsearch:
                         'industry': result[3], 'profiles': result[4],\
                         'type': result[5]}
 
+        CONF.MENU_LOGGER.debug(f"Returning (companies dpl profiles=): {result_dic}")
         return result_dic
 
 
@@ -119,7 +198,7 @@ class DBsearch:
            :param display_params: display parameters that the user has selected
            :param posit_disp_params: display parameters that the user has selected for positions
         """""
-
+        CONF.MENU_LOGGER.info(f"Entering company search function comp_search_db.")
         if not search_param['name'] is None:
             company_names = search_param['name']
 
@@ -127,15 +206,18 @@ class DBsearch:
             company_names = self.get_companies_by_loc(search_param['location'])
 
         for company_name in company_names:
+            CONF.MENU_LOGGER.debug(f"Beginning to collect info from the database for company: {company_name}")
             company_name = company_name.lower().replace('_', ' ')
             uid = self.get_company_uid_from_name(company_name)
             if uid is None:
                 print(f"Company with name '{company_name.replace('_', ' ')}' does not exist")
                 continue
             print('Company name: ' + company_name.replace('_', ' '))
+            CONF.MENU_LOGGER.debug(f"Calling  {self.get_company_info} with argument {uid}")
             info = self.get_company_info(uid)
 
             if display_params['pdl'] or display_params['all']:
+                CONF.MENU_LOGGER.debug(f"Calling  {self.get_dpl_profile} with argument {uid}")
                 resume=self.get_dpl_profile(uid)
                 for key, val in resume.items():
                     print(key,':',val)
@@ -145,10 +227,12 @@ class DBsearch:
             if display_params['website'] or display_params['all']:
                 print(info['website'])
             if display_params['description'] or display_params['all']:
+                CONF.MENU_LOGGER.debug(f"Calling  {self.get_company_description} with argument {uid}")
                 print(self.get_company_description(uid))
             if display_params['positions'] or display_params['all']:
                 name_dic = {'name': None, 'location': None, 'department': None, 'emp_type': None, 'exp_level': None,
                             'company': [company_name]}
+                CONF.MENU_LOGGER.debug(f"Calling  {self.posit_search_db} with arguments name_dic= {name_dic} and posit_disp_params={posit_disp_params}")
                 self.posit_search_db(name_dic, posit_disp_params)
 
     def create_posit_where_clause(self, posit_params):
@@ -184,12 +268,14 @@ class DBsearch:
         comp_uids = []
         if posit_params['company'] is not None:
             for comp_name in posit_params['company']:
+                CONF.MENU_LOGGER.debug(f"Calling {self.get_company_uid_from_name} for company: {comp_name}")
                 comp_uids.append(self.get_company_uid_from_name(comp_name.lower().replace('_', ' ')))
 
             conditions.append('company_uid=' + " OR company_uid=".join(["'{0}'".format(name) for name in comp_uids]))
 
         clause += ' AND '.join(["({0})".format(cond) for cond in conditions])
 
+        CONF.MENU_LOGGER.debug(f"Returning {clause}")
         return clause
 
     def get_position_description(self, uid):
@@ -202,8 +288,20 @@ class DBsearch:
         statement = f"SELECT description FROM position_description WHERE position_uid='{uid}'"
         ins = text(statement)
 
-        results = self.conn.execute(ins)
+        try:
+            results = self.conn.execute(ins)
+        except SQLAlchemyError as e:
+            print(e)
+            CONF.MENU_LOGGER.critical(f"{e}")
+            raise SQLAlchemyError(f"{e._message()}")
+        except DBAPIError as e2:
+            print(e2)
+            CONF.MENU_LOGGER.critical(f"{e2}")
+            raise DBAPIError(f"{e2.message()}")
+
+        CONF.MENU_LOGGER.debug(f"Successful execution of an SQL query to the database")
         for result in results:
+            CONF.MENU_LOGGER.debug(f"Returning {html2text.html2text(result[0])}")
             return html2text.html2text(result[0])
 
     def posit_search_db(self, posit_params, posit_display_params):
@@ -213,15 +311,27 @@ class DBsearch:
            :param posit_display_params: output display parameters selected by the user
            :return:
         """
-
+        CONF.MENU_LOGGER.info(f"Entering positions search function comp_search_db.")
+        CONF.MENU_LOGGER.debug(f"Calling {self.create_posit_where_clause} with argument {posit_params}")
         where_clause = self.create_posit_where_clause(posit_params)
 
         statement = "SELECT * FROM positions " + where_clause
         ins = text(statement)
-        sql_df = pd.read_sql(ins, self.conn)
+        try:
+            sql_df = pd.read_sql(ins, self.conn)
+        except SQLAlchemyError as e:
+            print(e)
+            CONF.MENU_LOGGER.critical(f"{e}")
+            raise SQLAlchemyError(f"{e._message()}")
+        except DBAPIError as e2:
+            print(e2)
+            CONF.MENU_LOGGER.critical(f"{e2}")
+            raise DBAPIError(f"{e2.message()}")
+        CONF.MENU_LOGGER.debug(f"Successful execution of an SQL query to the database")
         companies = sql_df.groupby('company_uid')
 
         for name, positions in companies:
+            CONF.MENU_LOGGER.debug(f"Calling {self.get_company_name_from_uid} with argument {name}")
             print('Company name: ', self.get_company_name_from_uid(name))
 
             for i, r in positions.iterrows():
@@ -236,6 +346,7 @@ class DBsearch:
                     print('\tExperience level:', r['experience_level'])
                 if posit_display_params['description'] or posit_display_params['all']:
                     print('\tDescription:')
+                    CONF.MENU_LOGGER.debug(f"Calling {self.get_position_description} with argument {r['position_uid']}")
                     print(self.get_position_description(r['position_uid']))
 
                 print('')

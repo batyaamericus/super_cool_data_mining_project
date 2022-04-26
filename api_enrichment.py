@@ -2,6 +2,7 @@ import requests
 from db_search_functions import DBsearch
 from sqlalchemy import text
 from config import db_setup_logger
+import config
 
 
 def api_enrichment():
@@ -16,29 +17,20 @@ def api_enrichment():
     for result in results:
         company_names.append(result[0])
 
-    API_KEY = "2ebf58a45a2e8784aa697aa6bfcd6a580e664d42c473c88745f656a27145f975"
-
-    PDL_URL = "https://api.peopledatalabs.com/v5/company/search"
-
-    H = {
-      'Content-Type': "application/json",
-      'X-api-key': API_KEY
-    }
-
     api_query = "SELECT * FROM company WHERE name="+" OR name=".join(["'{0}'".format(name) for name in company_names])
 
-    P = {
+    pdl_api_params = {
       'sql': api_query,
       'size': 10,
       'pretty': True
     }
-    db_setup_logger.debug(f'sending initial PDL api request')
+    config.db_setup_logger.debug(f'sending initial PDL api request')
     response = requests.get(
-      PDL_URL,
-      headers=H,
-      params=P
+      config.pdl_api_url,
+      headers=config.pdl_api_headers,
+      params=pdl_api_params
     ).json()
-    db_setup_logger.info(f'initial PDL api request received status code: {response["status"]}')
+    config.db_setup_logger.info(f'initial PDL api request received status code: {response["status"]}')
     return response
 
 
@@ -77,7 +69,7 @@ def add_info_to_db(response):
                         conn.execute(statement)
                         conn.commit()
 
-        db_setup_logger.info(f'successfully enriched table with information from PDL api')
+        config.db_setup_logger.info(f'successfully enriched table with information from PDL api')
     else:
         print("NOTE. The carrier pigeons lost motivation in flight. See error and try again.")
         print("error:", response)

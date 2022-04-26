@@ -34,3 +34,11 @@ google_api_headers = {
     'x-rapidapi-host': "google-search3.p.rapidapi.com",
     'x-rapidapi-key': "1cf3e6b18dmsh45dfd10636a972ap138459jsnedbb0fffe534"
     }
+
+# PDL API
+pdl_api_key = "2ebf58a45a2e8784aa697aa6bfcd6a580e664d42c473c88745f656a27145f975"
+pdl_api_url = "https://api.peopledatalabs.com/v5/company/search"
+pdl_api_headers = {
+      'Content-Type': "application/json",
+      'X-api-key': pdl_api_key
+    }

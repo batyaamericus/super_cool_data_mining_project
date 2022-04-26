@@ -5,7 +5,7 @@ from config import db_setup_logger
 import config
 
 
-def api_enrichment():
+def get_all_companies():
     db = DBsearch()
     conn = db.conn
 
@@ -17,7 +17,18 @@ def api_enrichment():
     for result in results:
         company_names.append(result[0])
 
+<<<<<<< HEAD
     api_query = "SELECT * FROM company WHERE name="+" OR name=".join(["'{0}'".format(name) for name in company_names])
+=======
+    return company_names
+
+
+def api_enrichment():
+
+    company_names=get_all_companies()
+
+    API_KEY = "2ebf58a45a2e8784aa697aa6bfcd6a580e664d42c473c88745f656a27145f975"
+>>>>>>> df553b04df8ce7147db1a3a282f4560f175ff126
 
     pdl_api_params = {
       'sql': api_query,
@@ -73,3 +84,4 @@ def add_info_to_db(response):
     else:
         print("NOTE. The carrier pigeons lost motivation in flight. See error and try again.")
         print("error:", response)
+        db_setup_logger.critical(f'Enrichment failed due to an error that has occurred when trying to make an API call')

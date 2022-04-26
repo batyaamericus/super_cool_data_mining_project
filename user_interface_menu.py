@@ -12,7 +12,7 @@ import config as CONF
 def main_menu():
     """This function displays the main menu prompting the user to selected company or positions search"""
 
-    CONF.MENU_LOGGER.info("Entering main menu.")
+    CONF.menu_logger.info("Entering main menu.")
     db_connector = DBsearch()
     sys.stdout.write('Welcome to the Comeet Scraper!\n')
     args = None
@@ -21,7 +21,7 @@ def main_menu():
               " 'p' for the latter.\n"
               "Type '-h' for help and '-q' to quit the program.")
         command = input("Enter command :")
-        CONF.MENU_LOGGER.debug(f"User input: {command}")
+        CONF.menu_logger.debug(f"User input: {command}")
         parser = nap.NewArgParser(exit_on_error=False)
 
         subparsers = parser.add_subparsers(help="Type of search: 'c' for company search and 'p' for positions search")
@@ -45,20 +45,20 @@ def main_menu():
             if not hasattr(args, 'func'):
                 print("argument {c,p}: invalid choice:", ' '.join(unknown), " (choose from 'c', 'p')")
                 parser.print_usage()
-                CONF.MENU_LOGGER.error("Invalid search parameter entered for main menu")
+                CONF.menu_logger.error("Invalid search parameter entered for main menu")
                 continue
 
-            CONF.MENU_LOGGER.debug(f"User input parsed successfully. Calling {getattr(args, 'func')}")
+            CONF.menu_logger.debug(f"User input parsed successfully. Calling {getattr(args, 'func')}")
             args.func(db_connector)
 
         except argparse.ArgumentError as error:
-            CONF.MENU_LOGGER.error(f"{error}")
+            CONF.menu_logger.error(f"{error}")
             print(error)
             continue
         except SystemExit:
             if args is not None:
                 if args.quit:
-                    CONF.MENU_LOGGER.info("Quitting application.")
+                    CONF.menu_logger.info("Quitting application.")
                     quit()
             continue
 
@@ -68,37 +68,37 @@ def search_company_menu(db_connector):
         It prompts the users to search the search and display parameters for the output.
         Finally it calls comp_search_db to preform the search."""
 
-    CONF.MENU_LOGGER.info(f"Entering menu for company search")
+    CONF.menu_logger.info(f"Entering menu for company search")
 
     print("You have selected to search for a company!")
 
-    CONF.MENU_LOGGER.debug(f"Calling {uif.setting_comp_search_params}")
+    CONF.menu_logger.debug(f"Calling {uif.setting_comp_search_params}")
     comp_params = uif.setting_comp_search_params()
 
     # if return value is False, the user selected -b
     if not comp_params:
-        CONF.MENU_LOGGER.info(f"Returning to main menu.")
+        CONF.menu_logger.info(f"Returning to main menu.")
         return
 
-    CONF.MENU_LOGGER.debug(f"Calling {uif.setting_display_params}")
+    CONF.menu_logger.debug(f"Calling {uif.setting_display_params}")
     display_params = uif.setting_display_params()
 
 
     # if return value is False, the user selected -x
     if not display_params:
-        CONF.MENU_LOGGER.info(f"Returning to main menu.")
+        CONF.menu_logger.info(f"Returning to main menu.")
         return
 
     posit_disp_params = None
     if display_params['positions'] or display_params['all']:
-        CONF.MENU_LOGGER.debug(f"Calling {uif.setting_posit_display_params}")
+        CONF.menu_logger.debug(f"Calling {uif.setting_posit_display_params}")
         posit_disp_params = uif.setting_posit_display_params()
         # if return value is False, the user selected -x
         if not posit_disp_params:
-            CONF.MENU_LOGGER.info(f"Returning to main menu.")
+            CONF.menu_logger.info(f"Returning to main menu.")
             return
 
-    CONF.MENU_LOGGER.debug(f"Calling {db_connector.comp_search_db} with parameters: \n comp_params= {comp_params}, \n display_params= {display_params}, \n posit_disp_params={posit_disp_params}")
+    CONF.menu_logger.debug(f"Calling {db_connector.comp_search_db} with parameters: \n comp_params= {comp_params}, \n display_params= {display_params}, \n posit_disp_params={posit_disp_params}")
     db_connector.comp_search_db(comp_params, display_params, posit_disp_params)
 
 
@@ -107,24 +107,24 @@ def search_positions_menu(db_connector):
             It prompts the users to search the search and display parameters for the output.
             Finally it calls posit_search_db to preform the search."""
 
-    CONF.MENU_LOGGER.info(f"Entering menu for positions search")
+    CONF.menu_logger.info(f"Entering menu for positions search")
 
-    CONF.MENU_LOGGER.debug(f"Calling {uif.setting_posit_search_params}")
+    CONF.menu_logger.debug(f"Calling {uif.setting_posit_search_params}")
     posit_params = uif.setting_posit_search_params()
 
     # if return value is False, the user selected -b
     if not posit_params:
-        CONF.MENU_LOGGER.info(f"Returning to main menu")
+        CONF.menu_logger.info(f"Returning to main menu")
         return
 
-    CONF.MENU_LOGGER.debug(f"Calling {uif.setting_posit_display_params}")
+    CONF.menu_logger.debug(f"Calling {uif.setting_posit_display_params}")
     posit_display_params = uif.setting_posit_display_params()
     # if return value is False, the user selected -x
     if not posit_display_params:
-        CONF.MENU_LOGGER.info(f"Returning to main menu")
+        CONF.menu_logger.info(f"Returning to main menu")
         return
 
-    CONF.MENU_LOGGER.debug(f"Calling {db_connector.posit_search_db} with parameters: \n posit_params= {posit_params},"
+    CONF.menu_logger.debug(f"Calling {db_connector.posit_search_db} with parameters: \n posit_params= {posit_params},"
                            f" \n posit_display_params= {posit_display_params}")
     db_connector.posit_search_db(posit_params, posit_display_params)
 

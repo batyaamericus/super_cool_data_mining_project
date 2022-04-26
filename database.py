@@ -6,16 +6,16 @@ import db_details
 from config import db_setup_logger
 
 
-engine = create_engine(config.ENGINE_URL, future=True)
+engine = create_engine(config.engine_url, future=True)
 
 
 def create_db():
     """
     creating a database into which we will put all of the information about the jobs we will scrape
     """
-    if not database_exists(config.ENGINE_URL):
+    if not database_exists(config.engine_url):
         db_setup_logger.info('database did not exist, creating it')
-        create_database(config.ENGINE_URL)
+        create_database(config.engine_url)
     db_setup_logger.info('database exists, no action taken')
 
 

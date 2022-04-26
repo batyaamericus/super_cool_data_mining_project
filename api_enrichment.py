@@ -25,10 +25,10 @@ def api_enrichment():
       'X-api-key': API_KEY
     }
 
-    sql_query = "SELECT * FROM company WHERE name="+" OR name=".join(["'{0}'".format(name) for name in company_names])
+    api_query = "SELECT * FROM company WHERE name="+" OR name=".join(["'{0}'".format(name) for name in company_names])
 
     P = {
-      'sql': sql_query,
+      'sql': api_query,
       'size': 10,
       'pretty': True
     }

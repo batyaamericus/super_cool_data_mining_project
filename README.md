@@ -26,7 +26,7 @@ The project: a web scraper for finding job positions from comeet.com company pag
     > in command line: `python user_interface_menu.py`
 * if your operating system does not recognise the `python` command, try running `python3`
 ### Advanced
-If you would like to open the interface without scraping for new jobs, open `user_interface.py` and comment out all of the functions that are called from `scraper.py`.
+If you would like to open the interface without scraping for new jobs, open `user_interface_menu.py` and comment out all of the functions that are called from `scraper.py`.
 
 ## The database:
 Each time you run the scrape, information is gathered by company and stored in the comeet_jobs database as described below.

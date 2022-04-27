@@ -5,9 +5,9 @@ The project: a web scraper for finding job positions from comeet.com company pag
 * Currently, the scraper returns the first 99 Google results for job positions, allowing us to scrape for data from more than 60 companies.
 
 ### Part 1
-1. An API is used to collect results from Google using the common url pattern for job positions used by comeet.com.
+1. An [API](https://rapidapi.com/apigeek/api/google-search3/) is used to collect results from Google using the common url pattern for job positions used by comeet.com.
 2. The urls for each job position are extracted from our results.
-3. 3. Each url is sliced to find the company's main page of job listings.
+3. Each url is sliced to find the company's main page of job listings.
 
 ### Part 2
 4. From within the company's page, we extract the element which contains the company data and the positions' data.

@@ -178,7 +178,7 @@ def setting_posit_display_params():
         flags_dic['employment type'] = params.t
         flags_dic['experience level'] = params.e
         flags_dic['description'] = params.s
-        flags_dic['updates'] = params.u
+        flags_dic['updated'] = params.u
         flags_dic['all'] = params.all
         if all([v for v in flags_dic.values() if v is False]):
             print(
